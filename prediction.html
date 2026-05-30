@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Magic Prediction</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Comic Sans MS", "Trebuchet MS", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 12% 12%, rgba(255, 175, 204, 0.45), transparent 28%),
+        radial-gradient(circle at 88% 18%, rgba(162, 210, 255, 0.48), transparent 28%),
+        radial-gradient(circle at 50% 92%, rgba(205, 180, 218, 0.42), transparent 34%),
+        linear-gradient(135deg, #fff8fb, #f7ecff 46%, #edf7ff);
+      color: #2d2433;
+      overflow-x: hidden;
+    }
+
+    .page {
+      min-height: 100vh;
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .comic-dots {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.22;
+      background-image: radial-gradient(#7a5d8b 1px, transparent 1px);
+      background-size: 16px 16px;
+      mix-blend-mode: multiply;
+    }
+
+    .comic-card {
+      position: relative;
+      z-index: 2;
+      width: min(100%, 440px);
+      border: 4px solid #2d2433;
+      border-radius: 28px;
+      background: #fffdf8;
+      box-shadow: 10px 10px 0 #2d2433, 0 28px 70px rgba(122, 93, 139, 0.24);
+      overflow: hidden;
+    }
+
+    .comic-header {
+      padding: 18px 18px 12px;
+      background: linear-gradient(135deg, #FFC8DC, #BEE0FE);
+      border-bottom: 4px solid #2d2433;
+      position: relative;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 7px 12px;
+      border: 3px solid #2d2433;
+      border-radius: 999px;
+      background: #fff;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      box-shadow: 4px 4px 0 #2d2433;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: clamp(30px, 9vw, 46px);
+      line-height: 0.95;
+      letter-spacing: -0.05em;
+      text-transform: uppercase;
+      color: #2d2433;
+      text-shadow: 3px 3px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .comic-bang {
+      position: absolute;
+      right: 14px;
+      bottom: 12px;
+      width: 78px;
+      height: 78px;
+      background: #FFAFCC;
+      border: 4px solid #2d2433;
+      clip-path: polygon(50% 0%, 61% 31%, 95% 12%, 74% 45%, 100% 55%, 68% 64%, 82% 100%, 50% 76%, 18% 100%, 32% 64%, 0 55%, 26% 45%, 5% 12%, 39% 31%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 1000;
+      transform: rotate(-12deg);
+    }
+
+    .comic-body {
+      padding: 18px;
+    }
+
+    .stage {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+
+    .magician-wrap {
+      height: 190px;
+      border: 4px solid #2d2433;
+      border-radius: 22px;
+      background: radial-gradient(circle at 50% 30%, #ffffff, #f7ecff 70%);
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      box-shadow: 5px 5px 0 #2d2433;
+    }
+
+    .magician {
+      width: 130px;
+      max-height: 185px;
+      object-fit: contain;
+      object-position: bottom center;
+      filter: drop-shadow(0 8px 0 rgba(45, 36, 51, 0.16));
+    }
+
+    .speech {
+      position: relative;
+      min-height: 150px;
+      padding: 16px 14px;
+      border: 4px solid #2d2433;
+      border-radius: 22px;
+      background: #ffffff;
+      box-shadow: 5px 5px 0 #2d2433;
+      display: flex;
+      align-items: center;
+    }
+
+    .speech::before {
+      content: "";
+      position: absolute;
+      left: -18px;
+      bottom: 30px;
+      width: 28px;
+      height: 28px;
+      background: #ffffff;
+      border-left: 4px solid #2d2433;
+      border-bottom: 4px solid #2d2433;
+      transform: rotate(45deg);
+    }
+
+    .speech p {
+      font-size: 15px;
+      line-height: 1.55;
+      font-weight: 800;
+    }
+
+    .envelope-panel,
+    .privacy-note,
+    .question-box,
+    .thinking,
+    .result-panel {
+      border: 4px solid #2d2433;
+      border-radius: 24px;
+      box-shadow: 6px 6px 0 #2d2433;
+    }
+
+    .envelope-panel {
+      padding: 14px;
+      background: linear-gradient(135deg, #fff, #fff8fb);
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .envelope-panel::after {
+      content: "PREDICTION";
+      position: absolute;
+      right: -18px;
+      top: 14px;
+      transform: rotate(18deg);
+      font-size: 11px;
+      font-weight: 1000;
+      letter-spacing: 0.12em;
+      color: rgba(122, 93, 139, 0.22);
+    }
+
+    .envelope {
+      width: 100%;
+      height: 96px;
+      border: 4px solid #2d2433;
+      border-radius: 18px;
+      background: linear-gradient(145deg, #FFC8DC 0 48%, #FFAFCC 49% 100%);
+      box-shadow: inset 0 -18px 0 rgba(255, 255, 255, 0.28);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 1000;
+      color: #2d2433;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      position: relative;
+    }
+
+    .envelope::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      clip-path: polygon(0 0, 50% 55%, 100% 0, 100% 100%, 0 100%);
+      background: rgba(255, 255, 255, 0.24);
+      border-radius: 14px;
+    }
+
+    .lock-text {
+      margin-top: 10px;
+      font-size: 12px;
+      font-weight: 900;
+      color: #6d5578;
+      text-align: center;
+    }
+
+    .privacy-note {
+      margin-bottom: 16px;
+      padding: 13px 14px;
+      background: #BEE0FE;
+    }
+
+    .privacy-note strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+      font-weight: 1000;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .privacy-note p {
+      font-size: 13px;
+      line-height: 1.5;
+      font-weight: 800;
+      color: #2d2433;
+    }
+
+    .progress {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 12px;
+      font-weight: 1000;
+      color: #6d5578;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .question-box {
+      padding: 16px;
+      background: #fff;
+      min-height: 245px;
+    }
+
+    .question-text {
+      font-size: 19px;
+      line-height: 1.3;
+      font-weight: 1000;
+      margin-bottom: 14px;
+    }
+
+    .answers {
+      display: grid;
+      gap: 10px;
+    }
+
+    .answer-btn {
+      width: 100%;
+      border: 3px solid #2d2433;
+      border-radius: 18px;
+      background: #fff8fb;
+      padding: 12px 13px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 900;
+      color: #2d2433;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 #2d2433;
+      transition: 0.12s ease;
+    }
+
+    .answer-btn:hover,
+    .answer-btn:active {
+      transform: translate(3px, 3px);
+      box-shadow: 1px 1px 0 #2d2433;
+      background: #BEE0FE;
+    }
+
+    .free-input {
+      width: 100%;
+      min-height: 110px;
+      resize: vertical;
+      border: 3px solid #2d2433;
+      border-radius: 18px;
+      padding: 13px;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      color: #2d2433;
+      background: #fff8fb;
+      box-shadow: 4px 4px 0 #2d2433;
+      outline: none;
+    }
+
+    .free-input:focus {
+      background: #fff;
+    }
+
+    .action-row {
+      margin-top: 16px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .primary-btn {
+      border: 4px solid #2d2433;
+      border-radius: 999px;
+      padding: 13px 20px;
+      background: linear-gradient(135deg, #FFAFCC, #A2D2FF);
+      color: #2d2433;
+      font: inherit;
+      font-weight: 1000;
+      cursor: pointer;
+      box-shadow: 5px 5px 0 #2d2433;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .primary-btn:active {
+      transform: translate(3px, 3px);
+      box-shadow: 2px 2px 0 #2d2433;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .thinking {
+      padding: 18px;
+      background: #fff;
+      text-align: center;
+    }
+
+    .thinking .big {
+      font-size: 48px;
+      margin-bottom: 10px;
+      animation: bounce 0.8s ease-in-out infinite;
+    }
+
+    .thinking p {
+      font-weight: 1000;
+      line-height: 1.5;
+    }
+
+    .dots::after {
+      content: "";
+      animation: dots 1.1s steps(4, end) infinite;
+    }
+
+    @keyframes dots {
+      0% { content: ""; }
+      25% { content: "."; }
+      50% { content: ".."; }
+      75% { content: "..."; }
+      100% { content: ""; }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .result-panel {
+      padding: 16px;
+      background: #ffffff;
+    }
+
+    .result-title {
+      font-size: 28px;
+      line-height: 1;
+      font-weight: 1000;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      color: #2d2433;
+    }
+
+    .result-text {
+      font-size: 15px;
+      line-height: 1.7;
+      font-weight: 800;
+      color: #3d3245;
+      white-space: pre-wrap;
+    }
+
+    .result-text strong,
+    .highlight {
+      background: #FFC8DC;
+      padding: 1px 5px;
+      border-radius: 7px;
+      font-weight: 1000;
+    }
+
+    .error-note {
+      margin-top: 12px;
+      padding: 10px;
+      border: 3px solid #2d2433;
+      border-radius: 16px;
+      background: #FFC8DC;
+      font-size: 12px;
+      font-weight: 900;
+      display: none;
+    }
+
+    .error-note.show {
+      display: block;
+    }
+
+    @media (max-width: 430px) {
+      .page {
+        padding: 12px;
+        align-items: flex-start;
+      }
+
+      .comic-card {
+        box-shadow: 7px 7px 0 #2d2433, 0 22px 54px rgba(122, 93, 139, 0.22);
+      }
+
+      .stage {
+        grid-template-columns: 104px 1fr;
+      }
+
+      .magician-wrap {
+        height: 172px;
+      }
+
+      .magician {
+        width: 120px;
+        max-height: 168px;
+      }
+
+      .speech {
+        min-height: 138px;
+        padding: 13px;
+      }
+
+      .speech p {
+        font-size: 13px;
+      }
+
+      .question-text {
+        font-size: 17px;
+      }
+
+      .comic-bang {
+        width: 64px;
+        height: 64px;
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="comic-dots"></div>
+
+  <main class="page">
+    <section class="comic-card">
+      <header class="comic-header">
+        <div class="badge">Magic Prediction</div>
+        <h1>Mirana Mind Show</h1>
+        <div class="comic-bang">POW!</div>
+      </header>
+
+      <div class="comic-body">
+        <section class="stage">
+          <div class="magician-wrap">
+            <img class="magician" src="assets/magician.png" alt="Mirana">
+          </div>
+
+          <div class="speech">
+            <p id="speechText">
+              Halo, aku Mirana. Malam ini aku akan jadi pesulap kecilmu dan mencoba membaca isi pikiranmu lewat beberapa pilihan rahasia.
+            </p>
+          </div>
+        </section>
+
+        <section class="envelope-panel" id="envelopePanel">
+          <div class="envelope" id="envelope">Amplop Prediksi</div>
+          <p class="lock-text" id="lockText">
+            Prediksi ini sudah Mirana siapkan sebelum kamu menjawab.
+          </p>
+        </section>
+
+        <div class="privacy-note">
+          <strong>Pesan Rahasia</strong>
+          <p>
+            Tenang, ini ruang kecil yang dibuat khusus untukmu.
+            Tidak ada penonton lain di sini.
+            Setelah 24 jam, pintu rahasia ini akan tertutup sendiri.
+          </p>
+        </div>
+
+        <section id="introPanel">
+          <div class="question-box">
+            <p class="question-text">
+              Jangan asal pilih. Jawab pelan-pelan, karena setiap pilihan akan menjadi bagian dari prediksi akhir Mirana.
+            </p>
+
+            <div class="action-row">
+              <button class="primary-btn" id="startBtn">Mulai Sesi</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="questionPanel" class="hidden">
+          <div class="progress">
+            <span id="progressText">Question 1/10</span>
+            <span>Think!</span>
+          </div>
+
+          <div class="question-box">
+            <p class="question-text" id="questionText"></p>
+            <div class="answers" id="answers"></div>
+
+            <div id="freeAnswerBox" class="hidden">
+              <textarea class="free-input" id="freeAnswerInput" placeholder="Tulis harapan kecilmu di sini..."></textarea>
+              <div class="action-row">
+                <button class="primary-btn" id="submitFreeAnswerBtn">Kunci Jawaban</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="thinkingPanel" class="thinking hidden">
+          <div class="big">🎩</div>
+          <p>
+            Mirana sedang membaca pola jawabanmu<span class="dots"></span><br>
+            Mengirim energi ke amplop prediksi<span class="dots"></span><br>
+            Menyusun hasil akhir<span class="dots"></span>
+          </p>
+        </section>
+
+        <section id="resultPanel" class="result-panel hidden">
+          <h2 class="result-title">Prediksi Terbuka!</h2>
+          <div class="result-text" id="resultText"></div>
+          <div class="error-note" id="errorNote">
+            Endpoint AI belum aktif, jadi hasil ini memakai fallback lokal.
+          </div>
+
+          <div class="action-row">
+            <button class="primary-btn" id="restartBtn">Ulangi Show</button>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const AI_ENDPOINT = "https://YOUR-BACKEND-ENDPOINT/generate-prediction";
+
+    const questions = [
+      {
+        key: "symbol",
+        text: "Mirana ingin tahu dulu: pilih satu simbol yang paling menarik perhatianmu.",
+        response: "Menarik... simbol itu biasanya tidak dipilih tanpa alasan.",
+        answers: [
+          { label: "🌙 Bulan", value: "Bulan", meaning: "tenang, dalam, dan sering memikirkan banyak hal diam-diam" },
+          { label: "🌸 Bunga", value: "Bunga", meaning: "lembut, hangat, dan membawa rasa nyaman" },
+          { label: "⭐ Bintang", value: "Bintang", meaning: "menyimpan harapan kecil yang tetap menyala" },
+          { label: "🎁 Kado", value: "Kado", meaning: "menyukai hal kecil yang punya makna besar dan kejutan di waktu tepat" }
+        ]
+      },
+      {
+        key: "color",
+        text: "Pilih warna yang paling dekat dengan suasana hatimu.",
+        response: "Warna itu memberi petunjuk. Mirana mulai melihat pola energimu.",
+        answers: [
+          { label: "Ungu Pastel", value: "Ungu Pastel", meaning: "misterius, sensitif, dan penuh imajinasi" },
+          { label: "Pink", value: "Pink", meaning: "manis, hangat, dan ingin diperlakukan dengan lembut" },
+          { label: "Biru", value: "Biru", meaning: "tenang, jernih, dan sering menyimpan perasaan sendiri" },
+          { label: "Putih", value: "Putih", meaning: "ingin memulai sesuatu dengan lebih ringan dan bersih" }
+        ]
+      },
+      {
+        key: "feeling",
+        text: "Pilih satu kata yang paling dekat dengan isi pikiranmu.",
+        response: "Mirana mulai melihat arah pikiranmu. Ini bukan pilihan acak.",
+        answers: [
+          { label: "Tenang", value: "Tenang", meaning: "sedang mencari ketenangan yang tidak perlu dijelaskan panjang-panjang" },
+          { label: "Bahagia", value: "Bahagia", meaning: "ingin bahagia dengan cara sederhana tapi benar-benar terasa" },
+          { label: "Kuat", value: "Kuat", meaning: "sudah melewati banyak hal dan tetap mencoba berdiri" },
+          { label: "Pulang", value: "Pulang", meaning: "merindukan tempat atau rasa yang membuatmu merasa aman" }
+        ]
+      },
+      {
+        key: "personality",
+        text: "Saat menghadapi hari berat, kamu biasanya bagaimana?",
+        response: "Nah, ini bagian yang paling membuka kepribadianmu.",
+        answers: [
+          { label: "Diam dulu", value: "Diam dulu", meaning: "memproses banyak hal dalam diam sebelum akhirnya bicara" },
+          { label: "Tertawa biar ringan", value: "Tertawa biar ringan", meaning: "sering menyembunyikan lelah di balik candaan" },
+          { label: "Tetap jalan pelan-pelan", value: "Tetap jalan pelan-pelan", meaning: "percaya langkah kecil tetap berarti asal tidak berhenti" },
+          { label: "Cari orang yang dipercaya", value: "Cari orang yang dipercaya", meaning: "kuat, tapi tetap butuh seseorang yang bisa jadi tempat aman" }
+        ]
+      },
+      {
+        key: "hiddenSide",
+        text: "Hal apa yang paling sering kamu sembunyikan dari orang lain?",
+        response: "Mirana paham. Tidak semua hal berat harus selalu terlihat.",
+        answers: [
+          { label: "Lelah", value: "Lelah", meaning: "sering terlihat baik-baik saja padahal sedang capek" },
+          { label: "Sedih", value: "Sedih", meaning: "punya sisi rapuh yang tidak mudah ditunjukkan" },
+          { label: "Rindu", value: "Rindu", meaning: "menyimpan perasaan yang kadang sulit diucapkan" },
+          { label: "Takut gagal", value: "Takut gagal", meaning: "punya harapan besar, tapi juga takut tidak sampai" }
+        ]
+      },
+      {
+        key: "need",
+        text: "Yang paling kamu butuhkan akhir-akhir ini apa?",
+        response: "Pilihan ini terdengar sederhana, tapi cukup jujur.",
+        answers: [
+          { label: "Waktu tenang", value: "Waktu tenang", meaning: "butuh ruang untuk bernapas tanpa banyak tuntutan" },
+          { label: "Pelukan", value: "Pelukan", meaning: "butuh rasa aman dan diterima apa adanya" },
+          { label: "Kejelasan", value: "Kejelasan", meaning: "butuh jawaban agar hati tidak terus menebak-nebak" },
+          { label: "Semangat baru", value: "Semangat baru", meaning: "butuh alasan baru untuk melangkah lebih ringan" }
+        ]
+      },
+      {
+        key: "wish",
+        text: "Kalau hidup memberi hadiah tahun ini, kamu ingin apa?",
+        response: "Amplop mulai bereaksi. Sepertinya ini bagian penting.",
+        answers: [
+          { label: "Lebih bahagia", value: "Lebih bahagia", meaning: "ingin menemukan bahagia yang lebih jujur dan ringan" },
+          { label: "Lebih kuat", value: "Lebih kuat", meaning: "ingin sanggup melewati hal besar tanpa kehilangan diri sendiri" },
+          { label: "Lebih damai", value: "Lebih damai", meaning: "ingin hidup yang tidak terlalu bising di dalam hati" },
+          { label: "Lebih dicintai", value: "Lebih dicintai", meaning: "ingin merasa dipilih, dijaga, dan dihargai" }
+        ]
+      },
+      {
+        key: "secretLine",
+        text: "Pilih satu kalimat yang paling ingin kamu dengar hari ini.",
+        response: "Kalimat ini seperti kunci kecil untuk amplop prediksi.",
+        answers: [
+          { label: "Aku sudah cukup kuat", value: "Aku sudah cukup kuat", meaning: "kamu sudah cukup kuat, bahkan saat kamu merasa belum" },
+          { label: "Aku pantas bahagia", value: "Aku pantas bahagia", meaning: "kamu pantas bahagia tanpa harus merasa bersalah" },
+          { label: "Aku tidak sendirian", value: "Aku tidak sendirian", meaning: "kamu tidak sendirian meski kadang rasanya menanggung semuanya sendiri" },
+          { label: "Aku akan baik-baik saja", value: "Aku akan baik-baik saja", meaning: "kamu akan baik-baik saja, pelan-pelan, dengan caramu sendiri" }
+        ]
+      },
+      {
+        key: "door",
+        text: "Pilih satu pintu yang ingin kamu buka.",
+        response: "Pintu terakhir sudah dipilih. Sekarang tinggal satu jawaban dari hatimu.",
+        answers: [
+          { label: "Pintu Harapan", value: "Pintu Harapan", meaning: "masih percaya ada hal baik yang sedang menunggu" },
+          { label: "Pintu Kejutan", value: "Pintu Kejutan", meaning: "ingin hidup memberi kejutan yang manis dan tidak terduga" },
+          { label: "Pintu Tenang", value: "Pintu Tenang", meaning: "ingin masuk ke fase yang lebih lembut dan damai" },
+          { label: "Pintu Baru", value: "Pintu Baru", meaning: "siap membuka babak baru yang lebih baik" }
+        ]
+      },
+      {
+        key: "freeHope",
+        text: "Terakhir, tulis satu harapan kecil untuk dirimu.",
+        response: "Jawaban bebasmu terkunci. Amplop prediksi Mirana akan dibuka.",
+        type: "text"
+      }
+    ];
+
+    const startBtn = document.getElementById("startBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const introPanel = document.getElementById("introPanel");
+    const questionPanel = document.getElementById("questionPanel");
+    const thinkingPanel = document.getElementById("thinkingPanel");
+    const resultPanel = document.getElementById("resultPanel");
+    const questionText = document.getElementById("questionText");
+    const answers = document.getElementById("answers");
+    const progressText = document.getElementById("progressText");
+    const speechText = document.getElementById("speechText");
+    const resultText = document.getElementById("resultText");
+    const envelope = document.getElementById("envelope");
+    const lockText = document.getElementById("lockText");
+    const freeAnswerBox = document.getElementById("freeAnswerBox");
+    const freeAnswerInput = document.getElementById("freeAnswerInput");
+    const submitFreeAnswerBtn = document.getElementById("submitFreeAnswerBtn");
+    const errorNote = document.getElementById("errorNote");
+
+    let currentIndex = 0;
+    let selected = {};
+
+    startBtn.addEventListener("click", startShow);
+    restartBtn.addEventListener("click", resetShow);
+    submitFreeAnswerBtn.addEventListener("click", submitFreeAnswer);
+
+    function startShow() {
+      currentIndex = 0;
+      selected = {};
+
+      introPanel.classList.add("hidden");
+      resultPanel.classList.add("hidden");
+      thinkingPanel.classList.add("hidden");
+      questionPanel.classList.remove("hidden");
+      errorNote.classList.remove("show");
+
+      envelope.textContent = "Amplop Terkunci";
+      lockText.textContent = "Jawab pelan-pelan. Prediksi Mirana masih tertutup.";
+
+      speechText.textContent = "Pertanyaan pertama akan membuka pintu kecil di pikiranmu.";
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      const question = questions[currentIndex];
+
+      progressText.textContent = "Question " + (currentIndex + 1) + "/" + questions.length;
+      questionText.textContent = question.text;
+      answers.innerHTML = "";
+      freeAnswerBox.classList.add("hidden");
+
+      if (question.type === "text") {
+        freeAnswerBox.classList.remove("hidden");
+        freeAnswerInput.value = "";
+        freeAnswerInput.focus();
+        return;
+      }
+
+      question.answers.forEach((answer) => {
+        const button = document.createElement("button");
+        button.className = "answer-btn";
+        button.textContent = answer.label;
+
+        button.addEventListener("click", () => {
+          selected[question.key] = answer;
+          speechText.textContent = question.response;
+          goNext();
+        });
+
+        answers.appendChild(button);
+      });
+    }
+
+    function submitFreeAnswer() {
+      const question = questions[currentIndex];
+      const value = freeAnswerInput.value.trim();
+
+      if (!value) {
+        speechText.textContent = "Tulis sedikit saja. Satu kalimat pun cukup.";
+        return;
+      }
+
+      selected[question.key] = {
+        label: value,
+        value: value,
+        meaning: value
+      };
+
+      speechText.textContent = question.response;
+      goNext();
+    }
+
+    function goNext() {
+      if (currentIndex < questions.length - 1) {
+        currentIndex += 1;
+        setTimeout(renderQuestion, 420);
+      } else {
+        finishQuestions();
+      }
+    }
+
+    function finishQuestions() {
+      questionPanel.classList.add("hidden");
+      thinkingPanel.classList.remove("hidden");
+
+      speechText.textContent = "Diam sebentar. Mirana sedang mencocokkan semua jawabanmu dengan isi amplop.";
+      envelope.textContent = "Membuka...";
+      lockText.textContent = "Prediksi sedang dibaca ulang.";
+
+      setTimeout(async () => {
+        await revealResult();
+      }, 1600);
+    }
+
+    function buildPayload() {
+      return {
+        hostName: "Mirana",
+        symbol: selected.symbol,
+        color: selected.color,
+        feeling: selected.feeling,
+        personality: selected.personality,
+        hiddenSide: selected.hiddenSide,
+        need: selected.need,
+        wish: selected.wish,
+        secretLine: selected.secretLine,
+        door: selected.door,
+        freeHope: selected.freeHope,
+        secretRoomNote: "Ini ruang kecil yang dibuat khusus untuk penerima. Tidak ada penonton lain di sini. Setelah 24 jam, pintu rahasia ini akan tertutup sendiri.",
+        instruction: "Buat hasil prediksi bergaya pesulap pembaca pikiran bernama Mirana untuk web ulang tahun personal. Bahasa Indonesia. Hangat, magical, personal, tidak seperti psikologi formal, jangan menyebut AI, jangan menyebut data, akhiri dengan ucapan ulang tahun emotional."
+      };
+    }
+
+    async function revealResult() {
+      thinkingPanel.classList.add("hidden");
+      resultPanel.classList.remove("hidden");
+
+      envelope.textContent = "Prediksi Terbuka!";
+      lockText.textContent = "Ternyata dari awal, arahnya sudah ke sini.";
+      speechText.textContent = "Mirana sudah menebaknya. Semua pilihanmu mengarah ke satu pesan.";
+
+      const payload = buildPayload();
+
+      try {
+        const aiText = await generateAiPrediction(payload);
+        resultText.textContent = aiText;
+      } catch (error) {
+        errorNote.classList.add("show");
+        resultText.innerHTML = buildFallbackPrediction(payload);
+      }
+    }
+
+    async function generateAiPrediction(payload) {
+      if (AI_ENDPOINT.includes("YOUR-BACKEND-ENDPOINT")) {
+        throw new Error("AI endpoint belum diatur.");
+      }
+
+      const response = await fetch(AI_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error("Gagal mengambil hasil AI.");
+      }
+
+      const data = await response.json();
+
+      if (!data.result) {
+        throw new Error("Format response AI tidak memiliki result.");
+      }
+
+      return data.result;
+    }
+
+    function buildFallbackPrediction(payload) {
+      return `
+        Mirana sudah menulis prediksi ini sebelum kamu menjawab.<br><br>
+
+        Kamu akan memilih simbol <span class="highlight">${payload.symbol.value}</span>,
+        simbol yang menggambarkan sisi dirimu yang ${payload.symbol.meaning}.<br><br>
+
+        Warna <span class="highlight">${payload.color.value}</span> menunjukkan bahwa kamu punya energi yang ${payload.color.meaning}.<br><br>
+
+        Dari kata <span class="highlight">${payload.feeling.value}</span>, Mirana membaca bahwa kamu ${payload.feeling.meaning}.<br><br>
+
+        Saat hari berat datang, kamu cenderung <span class="highlight">${payload.personality.value}</span>.
+        Itu berarti kamu ${payload.personality.meaning}.<br><br>
+
+        Ada sisi yang sering kamu sembunyikan: <span class="highlight">${payload.hiddenSide.value}</span>.
+        Tapi itu tidak membuatmu lemah. Itu hanya membuktikan bahwa kamu manusia yang sudah bertahan sejauh ini.<br><br>
+
+        Yang kamu butuhkan akhir-akhir ini adalah <span class="highlight">${payload.need.value}</span>,
+        dan hadiah yang kamu harapkan tahun ini adalah <span class="highlight">${payload.wish.value}</span>.<br><br>
+
+        Kalimat rahasiamu berkata: <span class="highlight">${payload.secretLine.value}</span>.<br><br>
+
+        Lalu kamu membuka <span class="highlight">${payload.door.value}</span>,
+        seolah ada bagian dari dirimu yang masih percaya bahwa hal baik sedang menunggu.<br><br>
+
+        Harapan kecilmu: <span class="highlight">${payload.freeHope.value}</span>.<br><br>
+
+        Jadi prediksi terakhir Mirana adalah:<br><br>
+
+        <span class="highlight">Hari ini bukan hari biasa.</span><br>
+        Orang yang membaca halaman ini pantas dirayakan dengan cara yang spesial.<br><br>
+
+        Selamat ulang tahun. Semoga semua hal baik yang tadi kamu pilih pelan-pelan datang ke hidupmu.
+      `;
+    }
+
+    function resetShow() {
+      introPanel.classList.remove("hidden");
+      questionPanel.classList.add("hidden");
+      thinkingPanel.classList.add("hidden");
+      resultPanel.classList.add("hidden");
+      errorNote.classList.remove("show");
+
+      envelope.textContent = "Amplop Prediksi";
+      lockText.textContent = "Prediksi ini sudah Mirana siapkan sebelum kamu menjawab.";
+
+      speechText.textContent = "Halo, aku Mirana. Malam ini aku akan jadi pesulap kecilmu dan mencoba membaca isi pikiranmu lewat beberapa pilihan rahasia.";
+    }
+  </script>
+</body>
+</html>
