@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Mini Game - Follow The Path</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(205, 180, 218, 0.42), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(162, 210, 255, 0.32), transparent 34%),
+        linear-gradient(145deg, #fff7fb, #f7ecff 45%, #edf7ff);
+      color: #4b3a55;
+      overflow: hidden;
+      user-select: none;
+      touch-action: none;
+    }
+
+    .page {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .game-card {
+      width: min(100%, 390px);
+      padding: 18px 14px 16px;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.74);
+      border: 1px solid rgba(205, 180, 218, 0.72);
+      box-shadow: 0 24px 70px rgba(142, 111, 156, 0.24);
+      backdrop-filter: blur(18px);
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 7px 13px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(205, 180, 218, 0.8);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #7a5d8b;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: clamp(24px, 7vw, 34px);
+      line-height: 1.08;
+      letter-spacing: -0.04em;
+      margin-bottom: 8px;
+      color: #67536e;
+    }
+
+    .desc {
+      font-size: 13px;
+      line-height: 1.5;
+      color: rgba(75, 58, 85, 0.72);
+      margin-bottom: 10px;
+    }
+
+    .status {
+      min-height: 20px;
+      margin-bottom: 10px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #9a6d8d;
+    }
+
+    .track-wrap {
+      position: relative;
+      width: min(100%, 340px);
+      margin: 0 auto;
+      aspect-ratio: 1 / 1.18;
+      border-radius: 24px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255, 200, 220, 0.45), transparent 28%),
+        radial-gradient(circle at 80% 80%, rgba(190, 224, 254, 0.55), transparent 30%),
+        linear-gradient(145deg, #fffafd, #f1f8ff);
+      border: 1px solid rgba(205, 180, 218, 0.62);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.72);
+      touch-action: none;
+    }
+
+    svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .road-shadow {
+      fill: none;
+      stroke: rgba(142, 111, 156, 0.16);
+      stroke-width: 58;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .road {
+      fill: none;
+      stroke: #FFC8DC;
+      stroke-width: 42;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .road-inner {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.75);
+      stroke-width: 12;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 9 14;
+    }
+
+    .danger {
+      position: absolute;
+      width: 46px;
+      height: 46px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 175, 204, 0.72);
+      border: 3px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 0 12px 24px rgba(142, 111, 156, 0.2);
+      color: #5f3d5d;
+      font-size: 21px;
+      z-index: 4;
+      pointer-events: none;
+      animation: pulseDanger 1.4s ease-in-out infinite;
+    }
+
+    .danger.one {
+      left: 78%;
+      top: 20%;
+    }
+
+    .danger.two {
+      left: 15%;
+      top: 52%;
+      animation-delay: -0.4s;
+    }
+
+    .danger.three {
+      left: 74%;
+      top: 73%;
+      animation-delay: -0.8s;
+    }
+
+    @keyframes pulseDanger {
+      0%, 100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.08);
+      }
+    }
+
+    .start-zone,
+    .finish-zone {
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      box-shadow: 0 12px 24px rgba(142, 111, 156, 0.18);
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    .start-zone {
+      left: 25px;
+      top: 24px;
+      background: #CDB4DA;
+      color: #3a2d42;
+    }
+
+    .finish-zone {
+      right: 22px;
+      bottom: 24px;
+      background: #A2D2FF;
+      color: #21384d;
+      font-size: 21px;
+    }
+
+    .player {
+      position: absolute;
+      left: 54px;
+      top: 55px;
+      width: 58px;
+      height: 58px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 31px;
+      background: #FFAFCC;
+      border: 4px solid rgba(255, 255, 255, 0.9);
+      box-shadow:
+        0 16px 30px rgba(255, 175, 204, 0.38),
+        0 0 0 5px rgba(255, 255, 255, 0.34);
+      z-index: 8;
+      cursor: grab;
+      transform: translate(-50%, -50%);
+      touch-action: none;
+      overflow: hidden;
+    }
+
+    .player img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 999px;
+      display: block;
+    }
+
+    .player .fallback-star {
+      display: none;
+    }
+
+    .player.no-image .fallback-star {
+      display: block;
+    }
+
+    .player.dragging {
+      cursor: grabbing;
+      scale: 1.08;
+    }
+
+    .player.error {
+      animation: shake 0.34s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { margin-left: 0; }
+      25% { margin-left: -8px; }
+      50% { margin-left: 8px; }
+      75% { margin-left: -5px; }
+    }
+
+    .reset-btn {
+      margin-top: 12px;
+      border: 0;
+      border-radius: 999px;
+      padding: 11px 17px;
+      background: linear-gradient(135deg, #FFC8DC, #BEE0FE);
+      color: #4b3a55;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 12px 24px rgba(142, 111, 156, 0.18);
+    }
+
+    .jumpscare {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 247, 251, 0.92);
+      pointer-events: none;
+    }
+
+    .jumpscare.show {
+      display: flex;
+      animation: jumpscareFlash 0.78s ease forwards;
+    }
+
+    .jumpscare-box {
+      width: 240px;
+      height: 240px;
+      border-radius: 999px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at top left, #FFAFCC, transparent 42%),
+        radial-gradient(circle at bottom right, #A2D2FF, transparent 42%),
+        #ffffff;
+      border: 6px solid #FFC8DC;
+      box-shadow:
+        0 0 0 14px rgba(255, 175, 204, 0.24),
+        0 28px 90px rgba(142, 111, 156, 0.42);
+      animation: jumpscarePop 0.78s cubic-bezier(.2, 1.4, .4, 1) forwards;
+    }
+
+    .jumpscare-face {
+      font-size: 86px;
+      line-height: 1;
+      animation: jumpscareShake 0.22s linear infinite;
+    }
+
+    .jumpscare-text {
+      margin-top: 10px;
+      font-size: 25px;
+      font-weight: 1000;
+      letter-spacing: 0.08em;
+      color: #7a5d8b;
+    }
+
+    @keyframes jumpscareFlash {
+      0% {
+        opacity: 0;
+        background: rgba(255, 255, 255, 0);
+      }
+
+      12% {
+        opacity: 1;
+        background: rgba(255, 255, 255, 1);
+      }
+
+      78% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+        background: rgba(255, 247, 251, 0.92);
+      }
+    }
+
+    @keyframes jumpscarePop {
+      0% {
+        transform: scale(0.2) rotate(-10deg);
+      }
+
+      28% {
+        transform: scale(1.22) rotate(7deg);
+      }
+
+      58% {
+        transform: scale(0.96) rotate(-4deg);
+      }
+
+      100% {
+        transform: scale(1) rotate(0deg);
+      }
+    }
+
+    @keyframes jumpscareShake {
+      0%, 100% {
+        transform: translate(0, 0) rotate(0deg);
+      }
+
+      25% {
+        transform: translate(-3px, 2px) rotate(-4deg);
+      }
+
+      50% {
+        transform: translate(3px, -2px) rotate(4deg);
+      }
+
+      75% {
+        transform: translate(-2px, -2px) rotate(-3deg);
+      }
+    }
+
+    .win-panel {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      background: rgba(255, 247, 251, 0.74);
+      backdrop-filter: blur(18px);
+    }
+
+    .win-panel.show {
+      display: flex;
+    }
+
+    .win-box {
+      width: min(100%, 390px);
+      padding: 28px 22px;
+      border-radius: 28px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(205, 180, 218, 0.75);
+      box-shadow: 0 24px 70px rgba(142, 111, 156, 0.25);
+    }
+
+    .win-box h2 {
+      font-size: 34px;
+      color: #67536e;
+      margin-bottom: 10px;
+      letter-spacing: -0.04em;
+    }
+
+    .win-box p {
+      color: rgba(75, 58, 85, 0.72);
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 430px) {
+      .page {
+        padding: 10px;
+      }
+
+      .game-card {
+        border-radius: 24px;
+        padding: 18px 10px 14px;
+      }
+
+      .track-wrap {
+        width: min(100%, 320px);
+        border-radius: 22px;
+      }
+
+      .player {
+        width: 56px;
+        height: 56px;
+      }
+
+      .danger {
+        width: 42px;
+        height: 42px;
+        font-size: 19px;
+      }
+
+      .jumpscare-box {
+        width: 210px;
+        height: 210px;
+      }
+
+      .jumpscare-face {
+        font-size: 76px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <section class="game-card">
+      <div class="badge">Mini Game</div>
+      <h1>Ikuti Jalurnya</h1>
+
+      <p class="desc">
+        Tekan avatar lalu geser mengikuti jalan berliku sampai FINISH.
+        Jangan keluar jalur dan jangan sentuh rintangan.
+      </p>
+
+      <div class="status" id="statusText">Mulai dari START.</div>
+
+      <div class="track-wrap" id="trackWrap">
+        <svg viewBox="0 0 360 430" preserveAspectRatio="none">
+          <path
+            id="trackPath"
+            class="road-shadow"
+            d="M58 58
+               C155 18 288 30 288 96
+               C288 154 126 112 84 158
+               C28 218 162 246 226 214
+               C318 168 330 296 238 302
+               C120 310 128 382 205 386
+               C250 390 274 374 304 366"
+          />
+
+          <path
+            class="road"
+            d="M58 58
+               C155 18 288 30 288 96
+               C288 154 126 112 84 158
+               C28 218 162 246 226 214
+               C318 168 330 296 238 302
+               C120 310 128 382 205 386
+               C250 390 274 374 304 366"
+          />
+
+          <path
+            class="road-inner"
+            d="M58 58
+               C155 18 288 30 288 96
+               C288 154 126 112 84 158
+               C28 218 162 246 226 214
+               C318 168 330 296 238 302
+               C120 310 128 382 205 386
+               C250 390 274 374 304 366"
+          />
+        </svg>
+
+        <div class="start-zone">Start</div>
+        <div class="finish-zone">🎁</div>
+
+        <div class="danger one">💩</div>
+        <div class="danger two">💩</div>
+        <div class="danger three">💩</div>
+
+        <div class="player" id="player">
+          <img id="playerImg" src="assets/player.png" alt="">
+          <span class="fallback-star">⭐</span>
+        </div>
+      </div>
+
+      <button class="reset-btn" id="resetBtn">Ulangi</button>
+    </section>
+  </main>
+
+  <section class="jumpscare" id="jumpscare">
+    <div class="jumpscare-box">
+      <div class="jumpscare-face">💩</div>
+      <div class="jumpscare-text">KAGET KAN?</div>
+    </div>
+  </section>
+
+  <section class="win-panel" id="winPanel">
+    <div class="win-box">
+      <div class="badge">Berhasil</div>
+      <h2>Finish 🎁</h2>
+      <p>
+        Kamu berhasil mengikuti jalur sampai akhir.
+        Kejutan berikutnya sudah bisa dibuka.
+      </p>
+      <button class="reset-btn" id="playAgainBtn">Main Lagi</button>
+    </div>
+  </section>
+
+  <script>
+    const trackWrap = document.getElementById("trackWrap");
+    const player = document.getElementById("player");
+    const playerImg = document.getElementById("playerImg");
+    const trackPath = document.getElementById("trackPath");
+    const statusText = document.getElementById("statusText");
+    const resetBtn = document.getElementById("resetBtn");
+    const winPanel = document.getElementById("winPanel");
+    const jumpscare = document.getElementById("jumpscare");
+    const playAgainBtn = document.getElementById("playAgainBtn");
+    const dangerEls = document.querySelectorAll(".danger");
+
+    const START = { x: 58, y: 58 };
+    const FINISH = { x: 304, y: 366 };
+    const VIEWBOX = { w: 360, h: 430 };
+
+    const ALLOWED_DISTANCE = 25;
+    const FINISH_DISTANCE = 32;
+    const DANGER_DISTANCE = 24;
+
+    let isDragging = false;
+    let hasStarted = false;
+    let hasWon = false;
+    let pathPoints = [];
+
+    playerImg.addEventListener("error", () => {
+      player.classList.add("no-image");
+      playerImg.style.display = "none";
+    });
+
+    playerImg.addEventListener("load", () => {
+      player.classList.remove("no-image");
+      playerImg.style.display = "block";
+    });
+
+    function buildPathPoints() {
+      pathPoints = [];
+      const totalLength = trackPath.getTotalLength();
+
+      for (let i = 0; i <= totalLength; i += 3) {
+        const point = trackPath.getPointAtLength(i);
+        pathPoints.push({ x: point.x, y: point.y });
+      }
+    }
+
+    function getSvgPointFromEvent(event) {
+      const rect = trackWrap.getBoundingClientRect();
+
+      const localX = event.clientX - rect.left;
+      const localY = event.clientY - rect.top;
+
+      return {
+        x: (localX / rect.width) * VIEWBOX.w,
+        y: (localY / rect.height) * VIEWBOX.h,
+        px: localX,
+        py: localY
+      };
+    }
+
+    function svgToPixel(point) {
+      const rect = trackWrap.getBoundingClientRect();
+
+      return {
+        x: (point.x / VIEWBOX.w) * rect.width,
+        y: (point.y / VIEWBOX.h) * rect.height
+      };
+    }
+
+    function distance(a, b) {
+      const dx = a.x - b.x;
+      const dy = a.y - b.y;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function distanceToPath(point) {
+      let min = Infinity;
+
+      for (const pathPoint of pathPoints) {
+        const d = distance(point, pathPoint);
+        if (d < min) min = d;
+      }
+
+      return min;
+    }
+
+    function getDangerSvgPoints() {
+      const wrapRect = trackWrap.getBoundingClientRect();
+
+      return Array.from(dangerEls).map((danger) => {
+        const rect = danger.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2 - wrapRect.left;
+        const centerY = rect.top + rect.height / 2 - wrapRect.top;
+
+        return {
+          x: (centerX / wrapRect.width) * VIEWBOX.w,
+          y: (centerY / wrapRect.height) * VIEWBOX.h
+        };
+      });
+    }
+
+    function isTouchingDanger(point) {
+      const dangerPoints = getDangerSvgPoints();
+
+      return dangerPoints.some((dangerPoint) => {
+        return distance(point, dangerPoint) < DANGER_DISTANCE;
+      });
+    }
+
+    function setPlayerSvgPosition(point) {
+      const pixel = svgToPixel(point);
+      player.style.left = pixel.x + "px";
+      player.style.top = pixel.y + "px";
+    }
+
+    function resetGame(message = "Mulai dari START.") {
+      isDragging = false;
+      hasStarted = false;
+      hasWon = false;
+      player.classList.remove("dragging");
+      winPanel.classList.remove("show");
+      jumpscare.classList.remove("show");
+      setPlayerSvgPosition(START);
+      statusText.textContent = message;
+    }
+
+    function failGame(message = "Keluar jalur. Ulangi dari START.") {
+      if (hasWon) return;
+
+      isDragging = false;
+      player.classList.remove("dragging");
+      player.classList.add("error");
+      statusText.textContent = message;
+
+      setTimeout(() => {
+        player.classList.remove("error");
+        resetGame("Coba lagi dari START.");
+      }, 420);
+    }
+
+    function winGame() {
+      if (hasWon) return;
+
+      hasWon = true;
+      isDragging = false;
+      player.classList.remove("dragging");
+      statusText.textContent = "Berhasil sampai FINISH.";
+
+      jumpscare.classList.remove("show");
+      void jumpscare.offsetWidth;
+      jumpscare.classList.add("show");
+
+      setTimeout(() => {
+        jumpscare.classList.remove("show");
+        winPanel.classList.add("show");
+      }, 900);
+    }
+
+    player.addEventListener("pointerdown", (event) => {
+      if (hasWon) return;
+
+      event.preventDefault();
+      player.setPointerCapture(event.pointerId);
+      isDragging = true;
+      hasStarted = true;
+      player.classList.add("dragging");
+      statusText.textContent = "Ikuti jalurnya pelan-pelan.";
+    });
+
+    player.addEventListener("pointermove", (event) => {
+      if (!isDragging || hasWon) return;
+
+      const point = getSvgPointFromEvent(event);
+      const pathDistance = distanceToPath(point);
+
+      setPlayerSvgPosition(point);
+
+      if (pathDistance > ALLOWED_DISTANCE) {
+        failGame("Keluar jalur. Ulangi dari START.");
+        return;
+      }
+
+      if (isTouchingDanger(point)) {
+        failGame("Kena rintangan. Balik ke START.");
+        return;
+      }
+
+      if (distance(point, FINISH) < FINISH_DISTANCE && hasStarted) {
+        winGame();
+      }
+    });
+
+    player.addEventListener("pointerup", () => {
+      if (!isDragging || hasWon) return;
+
+      isDragging = false;
+      player.classList.remove("dragging");
+      statusText.textContent = "Tahan terus sampai FINISH.";
+    });
+
+    player.addEventListener("pointercancel", () => {
+      isDragging = false;
+      player.classList.remove("dragging");
+    });
+
+    resetBtn.addEventListener("click", () => resetGame());
+    playAgainBtn.addEventListener("click", () => resetGame());
+
+    window.addEventListener("resize", () => {
+      resetGame();
+    });
+
+    buildPathPoints();
+    resetGame();
+  </script>
+</body>
+</html>
