@@ -17,10 +17,10 @@
       min-height: 100vh;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(255, 111, 174, 0.28), transparent 34%),
-        radial-gradient(circle at bottom right, rgba(255, 209, 102, 0.18), transparent 32%),
-        linear-gradient(145deg, #080713, #111027 55%, #090816);
-      color: #fff;
+        radial-gradient(circle at top left, rgba(205, 180, 218, 0.38), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(162, 210, 255, 0.28), transparent 34%),
+        linear-gradient(145deg, #fff7fb, #f7ecff 45%, #edf7ff);
+      color: #3a3140;
       overflow: hidden;
       touch-action: none;
     }
@@ -48,19 +48,22 @@
       display: inline-block;
       padding: 7px 13px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(205, 180, 218, 0.7);
       font-size: 11px;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: #ffd166;
+      color: #7a5d8b;
       margin-bottom: 12px;
+      box-shadow: 0 10px 24px rgba(205, 180, 218, 0.22);
     }
 
     .title h1 {
       font-size: clamp(24px, 7vw, 40px);
       line-height: 1.1;
       letter-spacing: -0.04em;
+      color: #67536e;
+      text-shadow: 0 8px 24px rgba(255, 255, 255, 0.9);
     }
 
     .hint {
@@ -72,7 +75,7 @@
       width: min(90%, 360px);
       text-align: center;
       font-size: 13px;
-      color: rgba(255, 255, 255, 0.62);
+      color: rgba(86, 69, 94, 0.72);
       pointer-events: none;
     }
 
@@ -80,12 +83,13 @@
       position: absolute;
       width: 220px;
       padding: 12px 12px 18px;
-      background: #f8f1e8;
+      background: #fff8fb;
       color: #17121a;
-      border-radius: 5px;
+      border-radius: 6px;
       box-shadow:
-        0 20px 45px rgba(0, 0, 0, 0.35),
-        inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+        0 20px 45px rgba(142, 111, 156, 0.22),
+        0 8px 18px rgba(121, 96, 130, 0.12),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.7);
       cursor: grab;
       user-select: none;
       touch-action: none;
@@ -120,17 +124,12 @@
 
     .quote-area {
       height: 210px;
-      border-radius: 3px;
-      background:
-        radial-gradient(circle at top left, rgba(255, 111, 174, 0.34), transparent 38%),
-        radial-gradient(circle at bottom right, rgba(255, 209, 102, 0.22), transparent 36%),
-        linear-gradient(145deg, #171226, #090712);
+      border-radius: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 18px;
       text-align: center;
-      color: #fff;
       overflow: hidden;
       pointer-events: none;
     }
@@ -138,7 +137,7 @@
     .quote-area p {
       font-size: 18px;
       line-height: 1.35;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: -0.02em;
     }
 
@@ -151,7 +150,7 @@
       text-align: center;
       font-size: 13px;
       line-height: 1.45;
-      color: #3a313a;
+      color: #5f5366;
       pointer-events: none;
     }
 
@@ -163,12 +162,22 @@
       animation-delay: 0s;
     }
 
+    .card-1 .quote-area {
+      background: #CDB4DA;
+      color: #3a2d42;
+    }
+
     .card-2 {
       left: 37%;
       top: 24%;
       transform: rotate(6deg);
       z-index: 5;
       animation-delay: -1.1s;
+    }
+
+    .card-2 .quote-area {
+      background: #FFC8DC;
+      color: #4a2c38;
     }
 
     .card-3 {
@@ -179,12 +188,22 @@
       animation-delay: -2.3s;
     }
 
+    .card-3 .quote-area {
+      background: #FFAFCC;
+      color: #4a2636;
+    }
+
     .card-4 {
       left: 17%;
       top: 55%;
       transform: rotate(8deg);
       z-index: 7;
       animation-delay: -0.7s;
+    }
+
+    .card-4 .quote-area {
+      background: #BEE0FE;
+      color: #24394a;
     }
 
     .card-5 {
@@ -195,12 +214,22 @@
       animation-delay: -1.8s;
     }
 
+    .card-5 .quote-area {
+      background: #A2D2FF;
+      color: #21384d;
+    }
+
     .card-6 {
       right: 12%;
       top: 54%;
       transform: rotate(5deg);
       z-index: 8;
       animation-delay: -3s;
+    }
+
+    .card-6 .quote-area {
+      background: linear-gradient(135deg, #CDB4DA, #FFC8DC, #FFAFCC, #BEE0FE, #A2D2FF);
+      color: #332b3a;
     }
 
     .cockroach {
@@ -212,7 +241,7 @@
       height: auto;
       pointer-events: none;
       opacity: 0;
-      filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.45));
+      filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.28));
     }
 
     .cockroach.run {
@@ -227,14 +256,15 @@
       transform: translateX(-50%);
       padding: 9px 14px;
       border-radius: 999px;
-      background: rgba(255, 255, 255, 0.11);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      color: #ffd166;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(205, 180, 218, 0.62);
+      color: #7a5d8b;
       font-size: 13px;
       font-weight: 800;
       opacity: 0;
       pointer-events: none;
       backdrop-filter: blur(12px);
+      box-shadow: 0 12px 30px rgba(205, 180, 218, 0.24);
     }
 
     .cockroach-label.show {
