@@ -276,6 +276,14 @@
       box-shadow: 0 12px 24px rgba(142, 111, 156, 0.18);
     }
 
+    .action-row {
+      margin-top: 16px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
     .jumpscare {
       position: fixed;
       inset: 0;
@@ -418,7 +426,7 @@
     .win-box p {
       color: rgba(75, 58, 85, 0.72);
       line-height: 1.6;
-      margin-bottom: 18px;
+      margin-bottom: 2px;
     }
 
     @media (max-width: 430px) {
@@ -541,7 +549,11 @@
         Kamu berhasil mengikuti jalur sampai akhir.
         Kejutan berikutnya sudah bisa dibuka.
       </p>
-      <button class="reset-btn" id="playAgainBtn">Main Lagi</button>
+
+      <div class="action-row">
+        <button class="reset-btn" id="playAgainBtn">Main Lagi</button>
+        <button class="reset-btn" id="nextPageBtn">Lanjut</button>
+      </div>
     </div>
   </section>
 
@@ -555,6 +567,7 @@
     const winPanel = document.getElementById("winPanel");
     const jumpscare = document.getElementById("jumpscare");
     const playAgainBtn = document.getElementById("playAgainBtn");
+    const nextPageBtn = document.getElementById("nextPageBtn");
     const dangerEls = document.querySelectorAll(".danger");
 
     const START = { x: 58, y: 58 };
@@ -751,6 +764,10 @@
 
     resetBtn.addEventListener("click", () => resetGame());
     playAgainBtn.addEventListener("click", () => resetGame());
+
+    nextPageBtn.addEventListener("click", () => {
+      window.location.href = "prediction.html";
+    });
 
     window.addEventListener("resize", () => {
       resetGame();
