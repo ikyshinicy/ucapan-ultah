@@ -1,1 +1,505 @@
-<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Floating Polaroid</title><style>*{box-sizing:border-box;margin:0;padding:0}body{min-height:100vh;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at top left,rgba(255,111,174,.28),transparent 34%),radial-gradient(circle at bottom right,rgba(255,209,102,.18),transparent 32%),linear-gradient(145deg,#080713,#111027 55%,#090816);color:#fff;overflow:hidden;touch-action:none}.page{width:100vw;height:100vh;position:relative;overflow:hidden;padding:20px}.title{position:fixed;top:26px;left:50%;transform:translateX(-50%);z-index:20;width:min(90%,420px);text-align:center;pointer-events:none}.badge{display:inline-block;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#ffd166;margin-bottom:12px}.title h1{font-size:clamp(24px,7vw,40px);line-height:1.1;letter-spacing:-.04em}.hint{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:20;width:min(90%,360px);text-align:center;font-size:13px;color:rgba(255,255,255,.62);pointer-events:none}.game-link{position:fixed;right:18px;bottom:18px;z-index:30;text-decoration:none;padding:11px 15px;border-radius:999px;background:linear-gradient(135deg,#ff6fae,#ffd166);color:#1a1020;font-weight:800;font-size:12px}.polaroid{position:absolute;width:220px;padding:12px 12px 18px;background:#f8f1e8;color:#17121a;border-radius:5px;box-shadow:0 20px 45px rgba(0,0,0,.35),inset 0 0 0 1px rgba(0,0,0,.04);cursor:grab;user-select:none;touch-action:none;will-change:translate,transform;translate:var(--drag-x,0px) var(--drag-y,0px);animation:floatPolaroid 4.8s ease-in-out infinite}.polaroid:active{cursor:grabbing}.polaroid.dragging{z-index:999!important;animation:none;scale:1.03}@keyframes floatPolaroid{0%{translate:var(--drag-x,0px) var(--drag-y,0px)}50%{translate:var(--drag-x,0px) calc(var(--drag-y,0px) - 14px)}100%{translate:var(--drag-x,0px) var(--drag-y,0px)}}.quote-area{height:210px;border-radius:3px;background:radial-gradient(circle at top left,rgba(255,111,174,.34),transparent 38%),radial-gradient(circle at bottom right,rgba(255,209,102,.22),transparent 36%),linear-gradient(145deg,#171226,#090712);display:flex;align-items:center;justify-content:center;padding:18px;text-align:center;color:#fff;overflow:hidden;pointer-events:none}.quote-area p{font-size:18px;line-height:1.35;font-weight:700;letter-spacing:-.02em}.caption{padding-top:15px;min-height:58px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;line-height:1.45;color:#3a313a;pointer-events:none}.card-1{left:8%;top:22%;transform:rotate(-9deg);z-index:4;animation-delay:0s}.card-2{left:37%;top:24%;transform:rotate(6deg);z-index:5;animation-delay:-1.1s}.card-3{right:8%;top:21%;transform:rotate(-4deg);z-index:3;animation-delay:-2.3s}.card-4{left:17%;top:55%;transform:rotate(8deg);z-index:7;animation-delay:-.7s}.card-5{left:47%;top:55%;transform:rotate(-7deg);z-index:6;animation-delay:-1.8s}.card-6{right:12%;top:54%;transform:rotate(5deg);z-index:8;animation-delay:-3s}.cockroach{position:fixed;left:-260px;top:65%;z-index:9999;width:220px;height:auto;pointer-events:none;opacity:0;filter:drop-shadow(0 8px 10px rgba(0,0,0,.45))}.cockroach.run{animation:cockroachRun 2.8s linear forwards}.cockroach-label{position:fixed;z-index:9998;left:50%;top:18%;transform:translateX(-50%);padding:9px 14px;border-radius:999px;background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.16);color:#ffd166;font-size:13px;font-weight:800;opacity:0;pointer-events:none;backdrop-filter:blur(12px)}.cockroach-label.show{animation:labelPop 1.3s ease forwards}@keyframes labelPop{18%,78%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}100%{opacity:0;transform:translateX(-50%) translateY(-10px) scale(.98)}}@keyframes cockroachRun{0%{left:-260px;top:var(--roach-top,65%);opacity:0;transform:rotate(20deg) scale(1)}8%{opacity:1}20%{top:calc(var(--roach-top,65%) - 8%);transform:rotate(-18deg) scale(1.08)}42%{top:calc(var(--roach-top,65%) + 7%);transform:rotate(22deg)}64%{top:calc(var(--roach-top,65%) - 5%);transform:rotate(-12deg) scale(1.1)}90%{opacity:1}100%{left:calc(100vw + 280px);top:calc(var(--roach-top,65%) + 3%);opacity:0;transform:rotate(25deg)}}@media(max-width:760px){body{overflow-y:auto;touch-action:pan-y}.page{min-height:100vh;height:auto;overflow:visible;padding:130px 18px 90px;display:grid;grid-template-columns:1fr;gap:24px}.polaroid{position:relative;left:auto!important;right:auto!important;top:auto!important;width:min(100%,280px);margin:0 auto}.quote-area{height:250px}.quote-area p{font-size:20px}.card-1,.card-2,.card-3,.card-4,.card-5,.card-6{transform:rotate(0deg)}.cockroach{width:160px}.game-link{right:50%;transform:translateX(50%)}}</style></head><body><main class="page"><div class="title"><div class="badge">Private Access</div><h1>Pesan Kecil Untuk Hari Ini</h1></div><article class="polaroid card-1" data-x="0" data-y="0"><div class="quote-area"><p>Hari ini bukan cuma tentang bertambah umur.</p></div><div class="caption">Tapi tentang seberapa jauh kamu sudah bertahan.</div></article><article class="polaroid card-2" data-x="0" data-y="0"><div class="quote-area"><p>Pelan-pelan juga tetap disebut berjalan.</p></div><div class="caption">Jangan kecilkan langkahmu sendiri.</div></article><article class="polaroid card-3" data-x="0" data-y="0"><div class="quote-area"><p>Semoga hal baik menemukanmu tanpa harus kamu kejar terlalu keras.</p></div><div class="caption">Kamu juga pantas menerima.</div></article><article class="polaroid card-4" data-x="0" data-y="0"><div class="quote-area"><p>Kamu sudah melewati banyak hal yang tidak semua orang tahu.</p></div><div class="caption">Dan itu layak dirayakan.</div></article><article class="polaroid card-5" data-x="0" data-y="0"><div class="quote-area"><p>Semoga tahun ini lebih lembut dari tahun kemarin.</p></div><div class="caption">Lebih tenang, lebih ringan, lebih bahagia.</div></article><article class="polaroid card-6" data-x="0" data-y="0"><div class="quote-area"><p>Selamat ulang tahun.</p></div><div class="caption">Semoga hidupmu makin dekat dengan hal-hal yang kamu doakan diam-diam.</div></article><img class="cockroach" id="cockroach" src="assets/kecoak.gif" alt=""><div class="cockroach-label" id="cockroachLabel">eh apaan tuh?</div><p class="hint">Tekan dan geser card untuk memindahkannya.</p><a class="game-link" href="mini-game.html">Mini Game</a></main><script>const cards=document.querySelectorAll(".polaroid");let activeCard=null,startX=0,startY=0,currentX=0,currentY=0,topZ=50;cards.forEach(c=>c.addEventListener("pointerdown",startDrag));function startDrag(e){activeCard=e.currentTarget;activeCard.classList.add("dragging");activeCard.setPointerCapture(e.pointerId);activeCard.style.zIndex=++topZ;startX=e.clientX;startY=e.clientY;currentX=Number(activeCard.dataset.x)||0;currentY=Number(activeCard.dataset.y)||0;activeCard.addEventListener("pointermove",dragMove);activeCard.addEventListener("pointerup",endDrag);activeCard.addEventListener("pointercancel",endDrag)}function dragMove(e){if(!activeCard)return;const nx=currentX+e.clientX-startX,ny=currentY+e.clientY-startY;activeCard.dataset.x=nx;activeCard.dataset.y=ny;activeCard.style.setProperty("--drag-x",nx+"px");activeCard.style.setProperty("--drag-y",ny+"px")}function endDrag(e){if(!activeCard)return;activeCard.classList.remove("dragging");activeCard.releasePointerCapture(e.pointerId);activeCard.removeEventListener("pointermove",dragMove);activeCard.removeEventListener("pointerup",endDrag);activeCard.removeEventListener("pointercancel",endDrag);activeCard=null}const cockroach=document.getElementById("cockroach"),cockroachLabel=document.getElementById("cockroachLabel");function showCockroach(){cockroach.style.setProperty("--roach-top",(28+Math.random()*48)+"%");cockroach.classList.remove("run");void cockroach.offsetWidth;cockroach.classList.add("run");if(Math.random()>.35){cockroachLabel.classList.remove("show");void cockroachLabel.offsetWidth;cockroachLabel.classList.add("show")}setTimeout(showCockroach,6000+Math.random()*10000)}setTimeout(showCockroach,3500);</script></body></html>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Floating Polaroid</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(255, 111, 174, 0.28), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(255, 209, 102, 0.18), transparent 32%),
+        linear-gradient(145deg, #080713, #111027 55%, #090816);
+      color: #fff;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    .page {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+      padding: 20px;
+    }
+
+    .title {
+      position: fixed;
+      top: 26px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      width: min(90%, 420px);
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 7px 13px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #ffd166;
+      margin-bottom: 12px;
+    }
+
+    .title h1 {
+      font-size: clamp(24px, 7vw, 40px);
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+    }
+
+    .hint {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      z-index: 20;
+      width: min(90%, 360px);
+      text-align: center;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.62);
+      pointer-events: none;
+    }
+
+    .polaroid {
+      position: absolute;
+      width: 220px;
+      padding: 12px 12px 18px;
+      background: #f8f1e8;
+      color: #17121a;
+      border-radius: 5px;
+      box-shadow:
+        0 20px 45px rgba(0, 0, 0, 0.35),
+        inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+      will-change: translate, transform;
+      translate: var(--drag-x, 0px) var(--drag-y, 0px);
+      animation: floatPolaroid 4.8s ease-in-out infinite;
+    }
+
+    .polaroid:active {
+      cursor: grabbing;
+    }
+
+    .polaroid.dragging {
+      z-index: 999 !important;
+      animation: none;
+      scale: 1.03;
+    }
+
+    @keyframes floatPolaroid {
+      0% {
+        translate: var(--drag-x, 0px) var(--drag-y, 0px);
+      }
+
+      50% {
+        translate: var(--drag-x, 0px) calc(var(--drag-y, 0px) - 14px);
+      }
+
+      100% {
+        translate: var(--drag-x, 0px) var(--drag-y, 0px);
+      }
+    }
+
+    .quote-area {
+      height: 210px;
+      border-radius: 3px;
+      background:
+        radial-gradient(circle at top left, rgba(255, 111, 174, 0.34), transparent 38%),
+        radial-gradient(circle at bottom right, rgba(255, 209, 102, 0.22), transparent 36%),
+        linear-gradient(145deg, #171226, #090712);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      text-align: center;
+      color: #fff;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .quote-area p {
+      font-size: 18px;
+      line-height: 1.35;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .caption {
+      padding-top: 15px;
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.45;
+      color: #3a313a;
+      pointer-events: none;
+    }
+
+    .card-1 {
+      left: 8%;
+      top: 22%;
+      transform: rotate(-9deg);
+      z-index: 4;
+      animation-delay: 0s;
+    }
+
+    .card-2 {
+      left: 37%;
+      top: 24%;
+      transform: rotate(6deg);
+      z-index: 5;
+      animation-delay: -1.1s;
+    }
+
+    .card-3 {
+      right: 8%;
+      top: 21%;
+      transform: rotate(-4deg);
+      z-index: 3;
+      animation-delay: -2.3s;
+    }
+
+    .card-4 {
+      left: 17%;
+      top: 55%;
+      transform: rotate(8deg);
+      z-index: 7;
+      animation-delay: -0.7s;
+    }
+
+    .card-5 {
+      left: 47%;
+      top: 55%;
+      transform: rotate(-7deg);
+      z-index: 6;
+      animation-delay: -1.8s;
+    }
+
+    .card-6 {
+      right: 12%;
+      top: 54%;
+      transform: rotate(5deg);
+      z-index: 8;
+      animation-delay: -3s;
+    }
+
+    .cockroach {
+      position: fixed;
+      left: calc(100vw + 120px);
+      top: 65%;
+      z-index: 9999;
+      width: 220px;
+      height: auto;
+      pointer-events: none;
+      opacity: 0;
+      filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.45));
+    }
+
+    .cockroach.run {
+      animation: cockroachRun 2.8s linear forwards;
+    }
+
+    .cockroach-label {
+      position: fixed;
+      z-index: 9998;
+      left: 50%;
+      top: 18%;
+      transform: translateX(-50%);
+      padding: 9px 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.11);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #ffd166;
+      font-size: 13px;
+      font-weight: 800;
+      opacity: 0;
+      pointer-events: none;
+      backdrop-filter: blur(12px);
+    }
+
+    .cockroach-label.show {
+      animation: labelPop 1.3s ease forwards;
+    }
+
+    @keyframes labelPop {
+      0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(8px) scale(0.95);
+      }
+
+      18% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+      }
+
+      78% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-10px) scale(0.98);
+      }
+    }
+
+    @keyframes cockroachRun {
+      0% {
+        left: calc(100vw + 120px);
+        top: var(--roach-top, 65%);
+        opacity: 0;
+        transform: rotate(-20deg) scale(1);
+      }
+
+      8% {
+        opacity: 1;
+      }
+
+      20% {
+        top: calc(var(--roach-top, 65%) - 8%);
+        transform: rotate(18deg) scale(1.08);
+      }
+
+      42% {
+        top: calc(var(--roach-top, 65%) + 7%);
+        transform: rotate(-22deg) scale(1);
+      }
+
+      64% {
+        top: calc(var(--roach-top, 65%) - 5%);
+        transform: rotate(12deg) scale(1.1);
+      }
+
+      90% {
+        opacity: 1;
+      }
+
+      100% {
+        left: -280px;
+        top: calc(var(--roach-top, 65%) + 3%);
+        opacity: 0;
+        transform: rotate(-25deg) scale(1);
+      }
+    }
+
+    @media (max-width: 760px) {
+      body {
+        overflow-y: auto;
+        touch-action: pan-y;
+      }
+
+      .page {
+        min-height: 100vh;
+        height: auto;
+        overflow: visible;
+        padding: 130px 18px 90px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+
+      .polaroid {
+        position: relative;
+        left: auto !important;
+        right: auto !important;
+        top: auto !important;
+        width: min(100%, 280px);
+        margin: 0 auto;
+      }
+
+      .quote-area {
+        height: 250px;
+      }
+
+      .quote-area p {
+        font-size: 20px;
+      }
+
+      .card-1,
+      .card-2,
+      .card-3,
+      .card-4,
+      .card-5,
+      .card-6 {
+        transform: rotate(0deg);
+      }
+
+      .cockroach {
+        width: 160px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <div class="title">
+      <div class="badge">Private Access</div>
+      <h1>Pesan Kecil Untuk Hari Ini</h1>
+    </div>
+
+    <article class="polaroid card-1" data-x="0" data-y="0">
+      <div class="quote-area">
+        <p>Hari ini bukan cuma tentang bertambah umur.</p>
+      </div>
+      <div class="caption">
+        Tapi tentang seberapa jauh kamu sudah bertahan.
+      </div>
+    </article>
+
+    <article class="polaroid card-2" data-x="0" data-y="0">
+      <div class="quote-area">
+        <p>Pelan-pelan juga tetap disebut berjalan.</p>
+      </div>
+      <div class="caption">
+        Jangan kecilkan langkahmu sendiri.
+      </div>
+    </article>
+
+    <article class="polaroid card-3" data-x="0" data-y="0">
+      <div class="quote-area">
+        <p>Semoga hal baik menemukanmu tanpa harus kamu kejar terlalu keras.</p>
+      </div>
+      <div class="caption">
+        Kamu juga pantas menerima.
+      </div>
+    </article>
+
+    <article class="polaroid card-4" data-x="0" data-y="0">
+      <div class="quote-area">
+        <p>Kamu sudah melewati banyak hal yang tidak semua orang tahu.</p>
+      </div>
+      <div class="caption">
+        Dan itu layak dirayakan.
+      </div>
+    </article>
+
+    <article class="polaroid card-5" data-x="0" data-y="0">
+      <div class="quote-area">
+        <p>Semoga tahun ini lebih lembut dari tahun kemarin.</p>
+      </div>
+      <div class="caption">
+        Lebih tenang, lebih ringan, lebih bahagia.
+      </div>
+    </article>
+
+    <article class="polaroid card-6" data-x="0" data-y="0">
+      <div class="quote-area">
+        <p>Selamat ulang tahun.</p>
+      </div>
+      <div class="caption">
+        Semoga hidupmu makin dekat dengan hal-hal yang kamu doakan diam-diam.
+      </div>
+    </article>
+
+    <img class="cockroach" id="cockroach" src="assets/kecoak.gif" alt="">
+    <div class="cockroach-label" id="cockroachLabel">eh apaan tuh?</div>
+
+    <p class="hint">Tekan dan geser card untuk memindahkannya.</p>
+  </main>
+
+  <script>
+    const cards = document.querySelectorAll(".polaroid");
+    let activeCard = null;
+    let startX = 0;
+    let startY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let topZ = 50;
+
+    cards.forEach((card) => {
+      card.addEventListener("pointerdown", startDrag);
+    });
+
+    function startDrag(event) {
+      activeCard = event.currentTarget;
+      activeCard.classList.add("dragging");
+      activeCard.setPointerCapture(event.pointerId);
+
+      topZ += 1;
+      activeCard.style.zIndex = topZ;
+
+      startX = event.clientX;
+      startY = event.clientY;
+
+      currentX = Number(activeCard.dataset.x) || 0;
+      currentY = Number(activeCard.dataset.y) || 0;
+
+      activeCard.addEventListener("pointermove", dragMove);
+      activeCard.addEventListener("pointerup", endDrag);
+      activeCard.addEventListener("pointercancel", endDrag);
+    }
+
+    function dragMove(event) {
+      if (!activeCard) return;
+
+      const moveX = event.clientX - startX;
+      const moveY = event.clientY - startY;
+
+      const nextX = currentX + moveX;
+      const nextY = currentY + moveY;
+
+      activeCard.dataset.x = nextX;
+      activeCard.dataset.y = nextY;
+
+      activeCard.style.setProperty("--drag-x", nextX + "px");
+      activeCard.style.setProperty("--drag-y", nextY + "px");
+    }
+
+    function endDrag(event) {
+      if (!activeCard) return;
+
+      activeCard.classList.remove("dragging");
+      activeCard.releasePointerCapture(event.pointerId);
+
+      activeCard.removeEventListener("pointermove", dragMove);
+      activeCard.removeEventListener("pointerup", endDrag);
+      activeCard.removeEventListener("pointercancel", endDrag);
+
+      activeCard = null;
+    }
+
+    const cockroach = document.getElementById("cockroach");
+    const cockroachLabel = document.getElementById("cockroachLabel");
+
+    function showCockroach() {
+      const randomTop = 28 + Math.random() * 48;
+      cockroach.style.setProperty("--roach-top", randomTop + "%");
+
+      cockroach.classList.remove("run");
+      void cockroach.offsetWidth;
+      cockroach.classList.add("run");
+
+      if (Math.random() > 0.35) {
+        cockroachLabel.classList.remove("show");
+        void cockroachLabel.offsetWidth;
+        cockroachLabel.classList.add("show");
+      }
+
+      const nextRun = 6000 + Math.random() * 10000;
+      setTimeout(showCockroach, nextRun);
+    }
+
+    setTimeout(showCockroach, 3500);
+  </script>
+</body>
+</html>
