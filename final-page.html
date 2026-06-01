@@ -581,6 +581,30 @@
       margin-top: 64px;
     }
 
+    .hanging-polaroid:nth-child(5) {
+      rotate: -4deg;
+      animation-delay: -3.4s;
+      margin-top: 18px;
+    }
+
+    .hanging-polaroid:nth-child(6) {
+      rotate: 3deg;
+      animation-delay: -4.1s;
+      margin-top: 58px;
+    }
+
+    .hanging-polaroid:nth-child(7) {
+      rotate: -6deg;
+      animation-delay: -4.8s;
+      margin-top: 24px;
+    }
+
+    .hanging-polaroid:nth-child(8) {
+      rotate: 4deg;
+      animation-delay: -5.5s;
+      margin-top: 66px;
+    }
+
     @keyframes swing {
       0%, 100% {
         transform: rotate(0deg) translateY(0);
@@ -1202,6 +1226,38 @@
             </div>
             <div class="hanging-caption">Dan ada hari yang memang pantas dirayakan.</div>
           </article>
+
+          <article class="hanging-polaroid">
+            <div class="clip"></div>
+            <div class="photo-frame">
+              <img src="assets/gift-photo-5.jpg" alt="" onerror="this.replaceWith(createPlaceholder('Foto 5'))">
+            </div>
+            <div class="hanging-caption">Ada senyum yang sederhana, tapi tetap tinggal lama di ingatan.</div>
+          </article>
+
+          <article class="hanging-polaroid">
+            <div class="clip"></div>
+            <div class="photo-frame">
+              <img src="assets/gift-photo-6.jpg" alt="" onerror="this.replaceWith(createPlaceholder('Foto 6'))">
+            </div>
+            <div class="hanging-caption">Beberapa cerita kecil ternyata bisa terasa sangat dekat.</div>
+          </article>
+
+          <article class="hanging-polaroid">
+            <div class="clip"></div>
+            <div class="photo-frame">
+              <img src="assets/gift-photo-7.jpg" alt="" onerror="this.replaceWith(createPlaceholder('Foto 7'))">
+            </div>
+            <div class="hanging-caption">Tidak semua kenangan harus ramai untuk jadi berarti.</div>
+          </article>
+
+          <article class="hanging-polaroid">
+            <div class="clip"></div>
+            <div class="photo-frame">
+              <img src="assets/gift-photo-8.jpg" alt="" onerror="this.replaceWith(createPlaceholder('Foto 8'))">
+            </div>
+            <div class="hanging-caption">Dan semoga bagian baiknya terus bertambah setelah hari ini.</div>
+          </article>
         </div>
       </div>
     </section>
@@ -1292,6 +1348,9 @@
   </main>
 
   <script>
+    const CHAT_ENDPOINT = "https://cavouyzyasnuygkuwizy.supabase.co/functions/v1/generate-chat";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhdm91eXp5YXNudXlna3V3aXp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NjQzMDIsImV4cCI6MjA5NDQ0MDMwMn0.P9TepO4RLhxHv03ybUlwGMefCwkdjCnDwNpfqzAS2lo";
+
     const giftCard = document.getElementById("giftCard");
     const openGiftBtn = document.getElementById("openGiftBtn");
     const scrollHint = document.getElementById("scrollHint");
@@ -1371,9 +1430,18 @@
       addMessage("user", text);
       chatInput.value = "";
 
-      setTimeout(() => {
-        addMessage("bot", getMiranaReply(text));
-      }, 580);
+      setTimeout(async () => {
+        addMessage("bot", "Mirana sedang mengetik...");
+        const typingBubble = chatMessages.lastElementChild;
+
+        const reply = await getMiranaReply(text);
+
+        if (typingBubble) {
+          typingBubble.remove();
+        }
+
+        addMessage("bot", reply);
+      }, 300);
     });
 
     function addMessage(sender, text) {
@@ -1389,7 +1457,50 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    function getMiranaReply(text) {
+    async function getMiranaReply(text) {
+      const history = Array.from(chatMessages.querySelectorAll(".message"))
+        .map((message) => {
+          const bubble = message.querySelector(".bubble");
+          return {
+            role: message.classList.contains("user") ? "user" : "assistant",
+            content: bubble ? bubble.textContent : ""
+          };
+        })
+        .filter((item) => item.content.trim().length > 0)
+        .slice(-10);
+
+      try {
+        const response = await fetch(CHAT_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_ANON_KEY,
+            "Authorization": "Bearer " + SUPABASE_ANON_KEY
+          },
+          body: JSON.stringify({
+            message: text,
+            history,
+            creatorSecretStage
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Gagal mengambil jawaban Mirana.");
+        }
+
+        if (typeof data.creatorSecretStage === "number") {
+          creatorSecretStage = data.creatorSecretStage;
+        }
+
+        return data.reply || "Maaf, Mirana belum menemukan jawaban yang pas. Tolong coba tanya lagi ya.";
+      } catch (error) {
+        return getLocalMiranaReply(text);
+      }
+    }
+
+    function getLocalMiranaReply(text) {
       const lower = text.toLowerCase();
 
       const askingCreator =
@@ -1451,19 +1562,16 @@ Namamu pernah disebut bukan sebagai hal biasa. Dan panggilan "${recipientProfile
 
       if (askingCreator) {
         creatorSecretStage = 1;
-
         return "Maaf... Mirana tidak bisa memberi tahu. Tuan pembuat melarang Mirana membocorkan rahasia itu. Tapi kalau kamu benar-benar memaksa, tolong kasih Mirana sesuatu dulu.";
       }
 
       if (creatorSecretStage === 1 && askingWhat) {
         creatorSecretStage = 2;
-
         return "Tolong kasih Mirana coklat 🍫. Satu saja. Setelah itu Mirana bisikkan pelan-pelan. Terima kasih ya.";
       }
 
       if (creatorSecretStage >= 1 && givingChocolate) {
         creatorSecretStage = 3;
-
         return `Terima kasih untuk coklatnya 🍫. Oke... Mirana kasih tahu diam-diam ya.
 
 Ini dibuat oleh ${creatorProfile.displayName}.
@@ -1473,25 +1581,8 @@ Dia menyiapkan ruang kecil ini supaya hari ulang tahun ${recipientProfile.fullNa
 Tapi tolong jangan bilang Mirana yang bocorin.`;
       }
 
-      if (
-        creatorSecretStage >= 3 &&
-        (
-          lower.includes("iky siapa") ||
-          lower.includes("siapa iky") ||
-          lower.includes("iky shinicy") ||
-          lower.includes("rizky") ||
-          lower.includes("rizky reranza")
-        )
-      ) {
-        return `${creatorProfile.publicName} adalah nama kreatif dari ${creatorProfile.realName}. Dia suka membuat konsep visual, musik, web, dan tools berbasis AI. Bisa dibilang dia suka membangun sistem kreatif yang dipimpin manusia, bukan sekadar memakai teknologi secara kosong.`;
-      }
-
       if (lower.includes("mirana siapa") || lower.includes("siapa mirana")) {
         return "Mirana adalah pesulap kecil di halaman ini. Aku dibuat sebagai suara yang menemani perjalanan ini: sedikit misterius, sedikit lucu, tapi tetap menjaga supaya semuanya terasa hangat.";
-      }
-
-      if (lower.includes("mirana")) {
-        return "Aku Mirana, pesulap kecil di halaman ini. Tugasku menemani, membaca sedikit rasa, dan menjaga rahasia kecil di balik hadiah ini.";
       }
 
       if (lower.includes("ulang tahun") || lower.includes("ultah")) {
@@ -1502,44 +1593,7 @@ Tapi tolong jangan bilang Mirana yang bocorin.`;
         return "Cagya itu panggilan kecil yang terasa personal. Mirana tidak akan memakainya sembarangan, tapi aku tahu panggilan itu disimpan dengan rasa sayang.";
       }
 
-      if (lower.includes("bahagia")) {
-        return "Bahagia tidak selalu datang besar-besaran. Kadang ia datang pelan, lewat hal kecil yang membuat hati terasa lebih ringan.";
-      }
-
-      if (
-        lower.includes("sedih") ||
-        lower.includes("capek") ||
-        lower.includes("lelah") ||
-        lower.includes("cape")
-      ) {
-        return "Mirana dengar. Tidak apa-apa kalau hari ini kamu tidak sepenuhnya kuat. Bahkan orang yang terlihat baik-baik saja pun kadang butuh tempat untuk diam sebentar.";
-      }
-
-      if (lower.includes("hadiah") || lower.includes("kado")) {
-        return "Hadiah utamanya bukan cuma kado yang terbuka, tapi pesan bahwa kamu cukup berarti untuk dibuatkan ruang kecil seperti ini.";
-      }
-
-      if (lower.includes("sayang")) {
-        return "Kalau pertanyaanmu tentang rasa sayang, Mirana jawab pelan-pelan ya: rasa yang tulus tidak selalu ramai, kadang justru terlihat dari usaha kecil yang disiapkan diam-diam.";
-      }
-
-      if (lower.includes("kenapa")) {
-        return "Kadang alasan paling jujur tidak ditulis panjang-panjang. Kadang cukup terlihat dari usaha seseorang menyiapkan sesuatu dengan hati-hati.";
-      }
-
-      if (lower.includes("terima kasih") || lower.includes("makasih")) {
-        return "Sama-sama, Dea. Terima kasih juga sudah sampai sejauh ini dan mau membuka ruang kecil ini pelan-pelan.";
-      }
-
-      if (lower.includes("tolong")) {
-        return "Tentu. Mirana akan coba bantu sebisanya, pelan-pelan ya.";
-      }
-
-      if (lower.includes("maaf")) {
-        return "Tidak apa-apa. Maaf juga kalau Mirana tidak selalu bisa menjawab dengan sempurna, tapi aku akan tetap menjawab dengan hati-hati.";
-      }
-
-      return "Mirana belum tentu punya jawaban paling sempurna, tapi aku ingin bilang ini: apa pun yang sedang kamu pikirkan, semoga pelan-pelan menemukan jalan yang baik.";
+      return "Maaf, Mirana sedang sedikit kehilangan sinyal ajaibnya. Tapi aku tetap ingin bilang: apa pun yang sedang kamu pikirkan, semoga pelan-pelan menemukan jalan yang baik.";
     }
   </script>
 </body>
