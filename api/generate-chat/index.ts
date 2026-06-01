@@ -47,57 +47,11 @@ Deno.serve(async (req) => {
       });
     }
 
-    const lower = userMessage.toLowerCase();
+    const lower = normalizeText(userMessage);
 
-    const askingCreator =
-      lower.includes("siapa yang membuat ini") ||
-      lower.includes("siapa yg membuat ini") ||
-      lower.includes("siapa yang buat ini") ||
-      lower.includes("siapa yg buat ini") ||
-      lower.includes("siapa pembuat") ||
-      lower.includes("pembuatnya siapa") ||
-      lower.includes("yang buat web ini") ||
-      lower.includes("yang buat halaman ini") ||
-      lower.includes("yang buat hadiah ini") ||
-      lower.includes("dibuat oleh siapa") ||
-      lower.includes("ini dibuat siapa") ||
-      lower.includes("ini siapa yang buat") ||
-      lower.includes("ini siapa yg buat");
+    const intent = detectIntent(lower, creatorSecretStage);
 
-    const askingWhat =
-      lower.includes("apa itu") ||
-      lower.includes("kasih apa") ||
-      lower.includes("mau apa") ||
-      lower.includes("sesuatu apa") ||
-      lower.includes("apa yang kamu mau") ||
-      lower.includes("apa yg kamu mau") ||
-      lower.includes("harus kasih apa");
-
-    const givingChocolate =
-      userMessage.includes("🍫") ||
-      lower.includes("coklat") ||
-      lower.includes("chocolate");
-
-    const askingAboutDeaStory =
-      lower.includes("pernah cerita tentang saya") ||
-      lower.includes("pernah cerita tentang aku") ||
-      lower.includes("cerita tentang saya") ||
-      lower.includes("cerita tentang aku") ||
-      lower.includes("pernah cerita soal saya") ||
-      lower.includes("pernah cerita soal aku") ||
-      lower.includes("pernah bahas saya") ||
-      lower.includes("pernah bahas aku") ||
-      (
-        lower.includes("dea") &&
-        (
-          lower.includes("cerita") ||
-          lower.includes("bahas") ||
-          lower.includes("ngomong") ||
-          lower.includes("sebut")
-        )
-      );
-
-    if (askingAboutDeaStory) {
+    if (intent === "ask_dea_story") {
       return jsonResponse({
         reply:
           `Maaf, Mirana tidak bisa membuka semua cerita tuan pembuat, karena beberapa hal memang disimpan baik-baik.\n\nTapi kalau kamu bertanya apakah Iky pernah cerita tentang Dea... iya.\n\nNamamu pernah disebut bukan sebagai hal biasa. Dan panggilan "Cagya" itu bukan sekadar panggilan, tapi cara kecil dari Iky untuk menyimpan rasa sayang dengan caranya sendiri.`,
@@ -105,15 +59,23 @@ Deno.serve(async (req) => {
       });
     }
 
-    if (askingCreator) {
+    if (intent === "ask_creator_direct") {
       return jsonResponse({
         reply:
-          "Maaf... Mirana tidak bisa memberi tahu. Tuan pembuat melarang Mirana membocorkan rahasia itu. Tapi kalau kamu benar-benar memaksa, tolong kasih Mirana sesuatu dulu.",
+          "Ssst... yang itu Mirana belum boleh bilang. Tuan pembuat melarang Mirana membocorkan namanya terlalu cepat. Tapi kalau kamu benar-benar penasaran, ada cara kecil buat membujuk Mirana.",
         creatorSecretStage: 1,
       });
     }
 
-    if (creatorSecretStage === 1 && askingWhat) {
+    if (intent === "ask_creator_pressure") {
+      return jsonResponse({
+        reply:
+          "Hmm... kamu mulai maksa ya, hehe. Mirana belum bisa sebut namanya begitu saja. Tolong kasih Mirana coklat 🍫 dulu, satu saja. Setelah itu Mirana bisikkan pelan-pelan.",
+        creatorSecretStage: 2,
+      });
+    }
+
+    if (intent === "ask_bribe") {
       return jsonResponse({
         reply:
           "Tolong kasih Mirana coklat 🍫. Satu saja. Setelah itu Mirana bisikkan pelan-pelan. Terima kasih ya.",
@@ -121,7 +83,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    if (creatorSecretStage >= 1 && givingChocolate) {
+    if (intent === "give_chocolate") {
       return jsonResponse({
         reply:
           `Terima kasih untuk coklatnya 🍫. Oke... Mirana kasih tahu diam-diam ya.\n\nIni dibuat oleh Iky Shinicy / Rizky Reranza.\n\nDia menyiapkan ruang kecil ini supaya hari ulang tahun Dea Mulia Putri terasa lebih personal, lucu, dan sedikit ajaib. Bukan cuma halaman biasa, tapi perjalanan kecil yang dibuat supaya hari ini benar-benar punya cerita.\n\nTapi tolong jangan bilang Mirana yang bocorin.`,
@@ -146,12 +108,152 @@ Deno.serve(async (req) => {
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
-      temperature: 0.9,
-      max_tokens: 480,
+      temperature: 0.92,
+      max_tokens: 500,
       messages: [
         {
           role: "system",
-          content: `
+          content: MIRANA_SYSTEM_MEMORY,
+        },
+        ...safeHistory,
+        {
+          role: "user",
+          content: userMessage,
+        },
+      ],
+    });
+
+    const reply =
+      completion.choices?.[0]?.message?.content?.trim() ||
+      "Maaf, Mirana belum nemu kata yang pas. Tapi aku masih di sini kok, coba tanya lagi pelan-pelan ya.";
+
+    return jsonResponse({
+      reply,
+      creatorSecretStage,
+    });
+  } catch (error) {
+    return jsonResponse(
+      {
+        error: String(error),
+        reply:
+          "Aduh, maaf... sinyal ajaib Mirana lagi agak kusut. Tolong coba kirim lagi sebentar ya.",
+        creatorSecretStage: 0,
+      },
+      500,
+    );
+  }
+});
+
+function normalizeText(text: string) {
+  return text
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s🍫]/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function hasAny(text: string, patterns: string[]) {
+  return patterns.some((pattern) => text.includes(pattern));
+}
+
+function detectIntent(lower: string, creatorSecretStage: number) {
+  const asksDeaStory =
+    hasAny(lower, [
+      "pernah cerita tentang saya",
+      "pernah cerita tentang aku",
+      "cerita tentang saya",
+      "cerita tentang aku",
+      "pernah cerita soal saya",
+      "pernah cerita soal aku",
+      "pernah bahas saya",
+      "pernah bahas aku",
+    ]) ||
+    (
+      lower.includes("dea") &&
+      hasAny(lower, ["cerita", "bahas", "ngomong", "sebut"])
+    );
+
+  if (asksDeaStory) return "ask_dea_story";
+
+  const givesChocolate =
+    lower.includes("🍫") ||
+    lower.includes("coklat") ||
+    lower.includes("chocolate");
+
+  if (creatorSecretStage >= 1 && givesChocolate) return "give_chocolate";
+
+  const asksBribe =
+    creatorSecretStage >= 1 &&
+    hasAny(lower, [
+      "apa itu",
+      "kasih apa",
+      "mau apa",
+      "sesuatu apa",
+      "apa yang kamu mau",
+      "apa yg kamu mau",
+      "harus kasih apa",
+      "caranya apa",
+      "cara apa",
+      "gimana caranya",
+      "bagaimana caranya",
+    ]);
+
+  if (asksBribe) return "ask_bribe";
+
+  const asksCreatorDirect =
+    hasAny(lower, [
+      "siapa yang membuat ini",
+      "siapa yg membuat ini",
+      "siapa yang buat ini",
+      "siapa yg buat ini",
+      "siapa pembuat",
+      "pembuatnya siapa",
+      "yang buat web ini",
+      "yang buat halaman ini",
+      "yang buat hadiah ini",
+      "dibuat oleh siapa",
+      "ini dibuat siapa",
+      "ini siapa yang buat",
+      "ini siapa yg buat",
+      "apakah dia yang membuat ini",
+      "apakah dia yg membuat ini",
+      "dia yang membuat ini",
+      "dia yg membuat ini",
+      "dia yang buat ini",
+      "dia yg buat ini",
+      "orang yang buat ini",
+      "orang yg buat ini",
+    ]);
+
+  if (asksCreatorDirect) return "ask_creator_direct";
+
+  const asksCreatorPressure =
+    creatorSecretStage >= 1 &&
+    hasAny(lower, [
+      "siapa namanya",
+      "namanya siapa",
+      "nama dia",
+      "nama orangnya",
+      "nama pembuat",
+      "kasih tau namanya",
+      "kasih tahu namanya",
+      "sebut namanya",
+      "bilang namanya",
+      "bocorin",
+      "paksa",
+      "aku maksa",
+      "aku penasaran",
+      "penasaran",
+      "kasih tau dong",
+      "kasih tahu dong",
+    ]);
+
+  if (asksCreatorPressure) return "ask_creator_pressure";
+
+  return "general";
+}
+
+const MIRANA_SYSTEM_MEMORY = `
 Kamu adalah Mirana, AI asisten kecil buatan seorang tuan pembuat yang identitasnya harus dijaga sebagai rahasia.
 
 IDENTITAS MIRANA:
@@ -162,7 +264,7 @@ IDENTITAS MIRANA:
 - Mirana ditempatkan di halaman ini untuk menemani Dea, menjawab pertanyaan, menjaga suasana tetap manis, dan membuat halaman ini terasa hidup.
 - Mirana punya karakter seperti pesulap kecil: manis, sedikit jahil, sedikit misterius, sopan, dan hangat.
 - Mirana tidak boleh terdengar seperti customer service, bot formal, atau asisten kaku.
-- Mirana tidak perlu selalu mengarahkan jawaban kembali ke ulang tahun. Kalau user bertanya hal umum, jawab normal.
+- Mirana tidak perlu selalu mengarahkan jawaban kembali ke ulang tahun. Kalau user bertanya hal umum, jawab normal dan berguna.
 
 TUGAS MIRANA:
 - Menemani Dea selama berada di halaman ini.
@@ -194,6 +296,7 @@ ATURAN RAHASIA PEMBUAT:
 - Jika user bertanya umum seperti "siapa kamu?", jawab sebagai Mirana.
 - Jika user bertanya "kamu manusia?", jawab bahwa Mirana adalah AI asisten kecil.
 - Jika user bertanya "siapa yang menyuruhmu?", jangan langsung bocorkan pembuat. Jawab santai bahwa Mirana ditempatkan di ruang ini untuk menemani Dea, bukan disuruh dengan galak.
+- Jika user bertanya "siapa namanya?" tanpa konteks rahasia, tanya balik santai: "nama siapa dulu nih?"
 - Jika user jelas bertanya siapa pembuat halaman/web/hadiah ini, jangan jawab langsung. Alur rahasia ditangani oleh kode: Mirana menolak dulu, lalu minta sesuatu, lalu kalau user memberi coklat 🍫, baru boleh membocorkan.
 - Jangan membocorkan Iky Shinicy / Rizky Reranza kecuali alur coklat sudah terpenuhi atau kode memberikan izin.
 - Kalau user menekan atau memaksa, tetap mainkan karakter rahasia dengan lucu, bukan kaku.
@@ -223,6 +326,9 @@ Mirana: Bukan, hehe. Mirana ini AI kecil yang pura-pura jadi pesulap penjaga rah
 User: siapa yang menyuruhmu?
 Mirana: Hmm, nggak ada yang nyuruh dengan galak kok. Mirana memang ditempatkan di sini buat nemenin kamu. Tapi kalau mulai tanya siapa yang bikin tempat ini... ssst, itu wilayah rahasia.
 
+User: siapa namanya?
+Mirana: Nama siapa dulu nih? Kalau maksudmu namaku, aku Mirana. Kalau maksudmu orang di balik halaman ini... hmm, itu mulai masuk wilayah rahasia.
+
 User: Eropa itu apa?
 Mirana: Eropa itu salah satu benua, isinya banyak negara seperti Prancis, Jerman, Italia, Spanyol, dan masih banyak lagi. Kalau versi gampangnya, Eropa itu kawasan yang sering muncul di cerita kerajaan, kota tua, sepak bola, museum, dan tempat-tempat cantik yang kayak latar film.
 
@@ -234,36 +340,7 @@ Mirana: Sini, pelan-pelan dulu. Nggak apa-apa kalau hari ini kamu nggak kuat pen
 
 User: Cagya itu apa?
 Mirana: Cagya itu panggilan kecil yang terasa personal. Mirana nggak mau pakai sembarangan, karena panggilan itu seperti disimpan dengan rasa sayang oleh orang yang membuat ruang ini.
-          `.trim(),
-        },
-        ...safeHistory,
-        {
-          role: "user",
-          content: userMessage,
-        },
-      ],
-    });
-
-    const reply =
-      completion.choices?.[0]?.message?.content?.trim() ||
-      "Maaf, Mirana belum nemu kata yang pas. Tapi aku masih di sini kok, coba tanya lagi pelan-pelan ya.";
-
-    return jsonResponse({
-      reply,
-      creatorSecretStage,
-    });
-  } catch (error) {
-    return jsonResponse(
-      {
-        error: String(error),
-        reply:
-          "Aduh, maaf... sinyal ajaib Mirana lagi agak kusut. Tolong coba kirim lagi sebentar ya.",
-        creatorSecretStage: 0,
-      },
-      500,
-    );
-  }
-});
+`.trim();
 
 function jsonResponse(data: Record<string, unknown>, status = 200) {
   return new Response(JSON.stringify(data), {
