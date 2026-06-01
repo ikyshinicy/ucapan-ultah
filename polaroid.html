@@ -331,6 +331,34 @@
       }
     }
 
+
+
+    .next-action {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 40;
+      pointer-events: auto;
+    }
+
+    .next-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 13px 20px;
+      background: linear-gradient(135deg, #FFAFCC, #A2D2FF);
+      color: #2d2433;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 950;
+      cursor: pointer;
+      box-shadow: 0 14px 34px rgba(122, 93, 139, 0.24);
+      border: 2px solid rgba(122, 93, 139, 0.28);
+    }
+
+    .next-btn:active {
+      transform: scale(0.96);
+    }
+
     @media (max-width: 760px) {
       body {
         overflow-y: auto;
@@ -375,6 +403,18 @@
 
       .cockroach {
         width: 160px;
+      }
+
+      .next-action {
+        left: 50%;
+        right: auto;
+        bottom: 24px;
+        transform: translateX(-50%);
+        width: min(90%, 320px);
+      }
+
+      .next-btn {
+        width: 100%;
       }
     }
   </style>
@@ -445,6 +485,10 @@
     <div class="cockroach-label" id="cockroachLabel">eh apaan tuh?</div>
 
     <p class="hint">Tekan dan geser card untuk memindahkannya.</p>
+
+    <div class="next-action">
+      <button class="next-btn" id="nextBtn" type="button">Lanjut</button>
+    </div>
   </main>
 
   <script>
@@ -510,6 +554,11 @@
 
     const cockroach = document.getElementById("cockroach");
     const cockroachLabel = document.getElementById("cockroachLabel");
+    const nextBtn = document.getElementById("nextBtn");
+
+    nextBtn.addEventListener("click", () => {
+      window.location.href = "final-page.html";
+    });
 
     function showCockroach() {
       const randomTop = 28 + Math.random() * 48;
