@@ -38,75 +38,104 @@
       overflow-x: hidden;
     }
 
-    .loading-screen {
+    .splash-screen {
       position: fixed;
       inset: 0;
-      z-index: 999;
+      z-index: 9999;
+      width: 100vw;
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: 26px;
       background:
-        radial-gradient(circle at 20% 20%, rgba(236, 160, 180, 0.45), transparent 34%),
-        radial-gradient(circle at 82% 28%, rgba(78, 110, 162, 0.28), transparent 34%),
-        linear-gradient(135deg, #ffffff, #fff4f8 50%, #eef5ff);
-      transition: opacity 0.7s ease, visibility 0.7s ease;
+        radial-gradient(circle at 20% 18%, rgba(236, 160, 180, 0.50), transparent 34%),
+        radial-gradient(circle at 82% 24%, rgba(78, 110, 162, 0.30), transparent 35%),
+        radial-gradient(circle at 50% 88%, rgba(235, 212, 127, 0.38), transparent 38%),
+        linear-gradient(135deg, #ffffff, #fff4f8 48%, #eef5ff);
+      transition: opacity 0.75s ease, visibility 0.75s ease;
     }
 
-    .loading-screen.hide {
+    .splash-screen.hide {
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
     }
 
-    .loading-box {
-      width: min(100%, 390px);
-      padding: 32px 22px;
-      border-radius: 32px;
+    .splash-content {
+      width: min(100%, 520px);
       text-align: center;
-      background: rgba(255, 255, 255, 0.78);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
     }
 
-    .loading-icon {
-      width: 74px;
-      height: 74px;
-      margin: 0 auto 18px;
+    .splash-orb {
+      width: 102px;
+      height: 102px;
+      margin: 0 auto 24px;
       border-radius: 999px;
-      background: linear-gradient(135deg, var(--red), var(--yellow));
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.22), transparent 36%),
+        linear-gradient(135deg, var(--red), var(--yellow));
       color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 34px;
-      font-weight: 900;
-      box-shadow: 0 18px 34px rgba(201, 86, 80, 0.22);
-      animation: softPulse 1.6s ease-in-out infinite;
+      font-size: 44px;
+      font-weight: 950;
+      box-shadow: 0 24px 60px rgba(201, 86, 80, 0.28);
+      animation: splashPulse 1.6s ease-in-out infinite;
     }
 
-    .loading-box h1 {
-      font-size: clamp(30px, 8vw, 46px);
-      line-height: 1;
-      letter-spacing: -0.05em;
+    .splash-content h1 {
+      font-size: clamp(48px, 15vw, 84px);
+      line-height: 0.9;
       color: var(--red);
-      margin-bottom: 10px;
+      letter-spacing: -0.08em;
+      margin-bottom: 14px;
     }
 
-    .loading-box p {
-      color: var(--soft);
-      font-size: 15px;
-      line-height: 1.6;
+    .splash-content p {
+      font-size: 18px;
+      color: rgba(45, 36, 51, 0.68);
+      font-weight: 750;
     }
 
-    @keyframes softPulse {
+    .loading-dots {
+      margin-top: 24px;
+      display: flex;
+      justify-content: center;
+      gap: 9px;
+    }
+
+    .loading-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--blue);
+      animation: dotBounce 0.9s ease-in-out infinite;
+    }
+
+    .loading-dots span:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    .loading-dots span:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    @keyframes splashPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.07); }
+    }
+
+    @keyframes dotBounce {
       0%, 100% {
-        transform: scale(1);
+        transform: translateY(0);
+        opacity: 0.45;
       }
 
       50% {
-        transform: scale(1.06);
+        transform: translateY(-8px);
+        opacity: 1;
       }
     }
 
@@ -146,13 +175,8 @@
     }
 
     @keyframes floatGlow {
-      from {
-        transform: translateY(0) scale(1);
-      }
-
-      to {
-        transform: translateY(-18px) scale(1.08);
-      }
+      from { transform: translateY(0) scale(1); }
+      to { transform: translateY(-18px) scale(1.08); }
     }
 
     .card {
@@ -490,16 +514,27 @@
       .access-row b {
         font-size: 24px;
       }
+
+      .splash-orb {
+        width: 92px;
+        height: 92px;
+        font-size: 40px;
+      }
     }
   </style>
 </head>
 
 <body>
-  <div class="loading-screen" id="loadingScreen">
-    <div class="loading-box">
-      <div class="loading-icon">D</div>
+  <div class="splash-screen" id="splashScreen">
+    <div class="splash-content">
+      <div class="splash-orb">D</div>
       <h1>Hai Dea</h1>
-      <p>Selamat datang. Ada sesuatu yang sedang disiapkan khusus untukmu.</p>
+      <p>Selamat datang</p>
+      <div class="loading-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
     </div>
   </div>
 
@@ -638,7 +673,7 @@
     const validUsername = "DMP";
     const validPassword = "dea 2005";
 
-    const loadingScreen = document.getElementById("loadingScreen");
+    const splashScreen = document.getElementById("splashScreen");
 
     const daysEl = document.getElementById("days");
     const hoursEl = document.getElementById("hours");
@@ -668,8 +703,8 @@
 
     window.addEventListener("load", () => {
       setTimeout(() => {
-        loadingScreen.classList.add("hide");
-      }, 1650);
+        splashScreen.classList.add("hide");
+      }, 1700);
     });
 
     function padNumber(number) {
