@@ -4,18 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Private Access</title>
+  <title>Hai Dea</title>
 
   <style>
     :root {
-      --bg-main: #080713;
-      --bg-card: rgba(255, 255, 255, 0.08);
-      --text-main: #ffffff;
-      --text-soft: #c9c7d8;
-      --accent: #ff6fae;
-      --accent-2: #ffd166;
-      --border-soft: rgba(255, 255, 255, 0.14);
-      --shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+      --red: #C95650;
+      --blue: #4E6EA2;
+      --pink: #ECA0B4;
+      --yellow: #EBD47F;
+      --white: #FFFFFF;
+      --ink: #2D2433;
+      --soft: rgba(45, 36, 51, 0.66);
+      --card: rgba(255, 255, 255, 0.78);
+      --border: rgba(78, 110, 162, 0.18);
+      --shadow: 0 26px 80px rgba(78, 110, 162, 0.18);
     }
 
     * {
@@ -27,43 +29,120 @@
     body {
       min-height: 100vh;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text-main);
+      color: var(--ink);
       background:
-        radial-gradient(circle at top left, rgba(255, 111, 174, 0.28), transparent 34%),
-        radial-gradient(circle at bottom right, rgba(255, 209, 102, 0.18), transparent 32%),
-        linear-gradient(145deg, #080713, #111027 55%, #090816);
+        radial-gradient(circle at 12% 10%, rgba(236, 160, 180, 0.42), transparent 30%),
+        radial-gradient(circle at 88% 18%, rgba(78, 110, 162, 0.25), transparent 31%),
+        radial-gradient(circle at 50% 92%, rgba(235, 212, 127, 0.35), transparent 36%),
+        linear-gradient(135deg, #ffffff, #fff8fa 45%, #f3f7ff);
       overflow-x: hidden;
     }
 
-    .page {
-      min-height: 100vh;
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 24px;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(236, 160, 180, 0.45), transparent 34%),
+        radial-gradient(circle at 82% 28%, rgba(78, 110, 162, 0.28), transparent 34%),
+        linear-gradient(135deg, #ffffff, #fff4f8 50%, #eef5ff);
+      transition: opacity 0.7s ease, visibility 0.7s ease;
+    }
+
+    .loading-screen.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loading-box {
+      width: min(100%, 390px);
+      padding: 32px 22px;
+      border-radius: 32px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .loading-icon {
+      width: 74px;
+      height: 74px;
+      margin: 0 auto 18px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--red), var(--yellow));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      font-weight: 900;
+      box-shadow: 0 18px 34px rgba(201, 86, 80, 0.22);
+      animation: softPulse 1.6s ease-in-out infinite;
+    }
+
+    .loading-box h1 {
+      font-size: clamp(30px, 8vw, 46px);
+      line-height: 1;
+      letter-spacing: -0.05em;
+      color: var(--red);
+      margin-bottom: 10px;
+    }
+
+    .loading-box p {
+      color: var(--soft);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    @keyframes softPulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.06);
+      }
+    }
+
+    .page {
+      min-height: 100vh;
+      padding: 24px 18px 74px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       position: relative;
     }
 
-    .glow {
-      position: absolute;
-      width: 220px;
-      height: 220px;
+    .decor {
+      position: fixed;
       border-radius: 999px;
-      background: rgba(255, 111, 174, 0.22);
-      filter: blur(60px);
+      pointer-events: none;
+      filter: blur(52px);
+      opacity: 0.62;
       animation: floatGlow 6s ease-in-out infinite alternate;
     }
 
-    .glow.one {
-      top: 8%;
-      left: 8%;
+    .decor.one {
+      width: 230px;
+      height: 230px;
+      left: 7%;
+      top: 9%;
+      background: rgba(236, 160, 180, 0.38);
     }
 
-    .glow.two {
-      right: 8%;
-      bottom: 10%;
-      background: rgba(255, 209, 102, 0.16);
-      animation-delay: 1.5s;
+    .decor.two {
+      width: 250px;
+      height: 250px;
+      right: 6%;
+      bottom: 9%;
+      background: rgba(78, 110, 162, 0.24);
+      animation-delay: -1.4s;
     }
 
     @keyframes floatGlow {
@@ -77,14 +156,30 @@
     }
 
     .card {
-      width: min(100%, 460px);
-      padding: 34px 24px;
-      border-radius: 30px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-soft);
+      position: relative;
+      z-index: 2;
+      width: min(100%, 480px);
+      padding: 30px 20px 26px;
+      border-radius: 34px;
+      background: var(--card);
+      border: 1px solid var(--border);
       box-shadow: var(--shadow);
       backdrop-filter: blur(20px);
       text-align: center;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.55), transparent 34%),
+        radial-gradient(circle at 100% 0%, rgba(235, 212, 127, 0.20), transparent 36%);
+      pointer-events: none;
+    }
+
+    .content {
       position: relative;
       z-index: 2;
     }
@@ -95,163 +190,292 @@
       justify-content: center;
       padding: 8px 14px;
       border-radius: 999px;
-      font-size: 12px;
+      font-size: 11px;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: var(--accent-2);
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      margin-bottom: 20px;
+      color: #fff;
+      background: var(--blue);
+      margin-bottom: 18px;
+      box-shadow: 0 12px 28px rgba(78, 110, 162, 0.24);
+      font-weight: 900;
     }
 
     h1 {
-      font-size: clamp(30px, 8vw, 46px);
-      line-height: 1.05;
-      margin-bottom: 14px;
-      letter-spacing: -0.04em;
+      font-size: clamp(34px, 9vw, 52px);
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+      color: var(--red);
+      margin-bottom: 12px;
     }
 
     .subtitle {
-      color: var(--text-soft);
+      color: var(--soft);
       font-size: 15px;
       line-height: 1.7;
-      max-width: 340px;
-      margin: 0 auto 28px;
+      max-width: 360px;
+      margin: 0 auto 26px;
     }
 
     .countdown {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 12px;
-      margin-bottom: 26px;
+      margin-bottom: 18px;
     }
 
     .time-box {
-      padding: 18px 12px;
-      border-radius: 22px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 17px 12px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(78, 110, 162, 0.15);
+      box-shadow: 0 14px 30px rgba(78, 110, 162, 0.10);
     }
 
     .time-box strong {
       display: block;
-      font-size: clamp(30px, 10vw, 44px);
+      font-size: clamp(32px, 10vw, 46px);
       line-height: 1;
-      color: #fff;
-      letter-spacing: -0.05em;
+      color: var(--blue);
+      letter-spacing: -0.06em;
     }
 
     .time-box span {
       display: block;
       margin-top: 8px;
-      font-size: 12px;
-      color: var(--text-soft);
+      font-size: 11px;
+      color: rgba(45, 36, 51, 0.52);
       text-transform: uppercase;
       letter-spacing: 0.12em;
+      font-weight: 900;
     }
 
     .message {
-      min-height: 24px;
-      font-size: 14px;
-      color: var(--accent-2);
+      min-height: 22px;
+      font-size: 13px;
+      color: var(--red);
+      font-weight: 800;
+      margin-bottom: 14px;
     }
 
     .unlock-text {
-      margin-top: 10px;
-      padding: 14px;
-      border-radius: 18px;
-      background: rgba(255, 111, 174, 0.14);
-      border: 1px solid rgba(255, 111, 174, 0.22);
-      color: #fff;
-      line-height: 1.6;
+      margin: 0 auto 16px;
+      padding: 13px 14px;
+      border-radius: 20px;
+      background: rgba(235, 212, 127, 0.35);
+      border: 1px solid rgba(201, 86, 80, 0.16);
+      color: var(--ink);
+      line-height: 1.55;
       font-size: 14px;
-    }
-
-    .admin-test-btn {
-      margin-top: 22px;
-      padding: 11px 16px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.06);
-      color: rgba(255, 255, 255, 0.72);
-      font-size: 12px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: 0.2s ease;
-    }
-
-    .admin-test-btn:hover {
-      background: rgba(255, 255, 255, 0.12);
-      color: #ffffff;
+      font-weight: 750;
     }
 
     .login-form {
-      margin-top: 22px;
       display: grid;
       gap: 12px;
       text-align: left;
+      margin-top: 16px;
     }
 
     .login-label {
-      font-size: 12px;
-      color: var(--text-soft);
-      letter-spacing: 0.08em;
+      display: block;
+      margin-bottom: 6px;
+      font-size: 11px;
+      color: rgba(45, 36, 51, 0.58);
+      letter-spacing: 0.10em;
       text-transform: uppercase;
-      font-weight: 700;
+      font-weight: 900;
     }
 
     .login-input {
       width: 100%;
       padding: 14px 15px;
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: rgba(255, 255, 255, 0.08);
-      color: #ffffff;
+      border-radius: 18px;
+      border: 2px solid rgba(78, 110, 162, 0.16);
+      background: rgba(255, 255, 255, 0.74);
+      color: var(--ink);
       outline: none;
       font: inherit;
+      font-weight: 700;
     }
 
     .login-input::placeholder {
-      color: rgba(255, 255, 255, 0.36);
+      color: rgba(45, 36, 51, 0.32);
+      font-weight: 600;
     }
 
     .login-input:focus {
-      border-color: rgba(255, 209, 102, 0.55);
-      box-shadow: 0 0 0 4px rgba(255, 209, 102, 0.08);
+      border-color: var(--blue);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(78, 110, 162, 0.08);
+    }
+
+    .login-btn,
+    .hint-btn,
+    .show-access-btn {
+      width: 100%;
+      border: 0;
+      border-radius: 999px;
+      padding: 14px 18px;
+      font-weight: 950;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.18s ease;
     }
 
     .login-btn {
       margin-top: 4px;
-      width: 100%;
-      padding: 14px 18px;
-      border: 0;
-      border-radius: 999px;
-      background: linear-gradient(135deg, #ff6fae, #ffd166);
-      color: #1a1020;
-      font-weight: 900;
-      font-size: 14px;
-      cursor: pointer;
-      box-shadow: 0 16px 38px rgba(255, 111, 174, 0.24);
+      background: linear-gradient(135deg, var(--red), var(--yellow));
+      color: #fff;
+      box-shadow: 0 16px 34px rgba(201, 86, 80, 0.22);
+    }
+
+    .login-btn:disabled {
+      opacity: 0.58;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .hint-btn {
+      margin-top: 16px;
+      background: var(--blue);
+      color: #fff;
+      box-shadow: 0 14px 28px rgba(78, 110, 162, 0.20);
+    }
+
+    .show-access-btn {
+      margin-top: 12px;
+      background: #fff;
+      color: var(--blue);
+      border: 2px solid rgba(78, 110, 162, 0.18);
     }
 
     .login-message {
       min-height: 20px;
       margin-top: 2px;
       font-size: 13px;
-      color: #ffb3c7;
+      color: var(--red);
       text-align: center;
+      font-weight: 800;
+    }
+
+    .hint-panel {
+      margin-top: 16px;
+      display: grid;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .riddle-card,
+    .access-card {
+      padding: 15px 14px;
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(78, 110, 162, 0.16);
+      box-shadow: 0 12px 28px rgba(78, 110, 162, 0.10);
+    }
+
+    .riddle-card strong,
+    .access-card strong {
+      display: block;
+      font-size: 12px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 8px;
+    }
+
+    .riddle-card p {
+      font-size: 14px;
+      line-height: 1.62;
+      color: var(--soft);
+      font-weight: 650;
+    }
+
+    .access-card {
+      text-align: center;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(235, 212, 127, 0.32), transparent 34%),
+        linear-gradient(135deg, #ffffff, #fff8fa);
+      border: 2px dashed rgba(201, 86, 80, 0.36);
+    }
+
+    .access-card h2 {
+      font-size: 18px;
+      color: var(--red);
+      margin-bottom: 14px;
+      letter-spacing: -0.02em;
+    }
+
+    .access-row {
+      display: grid;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+
+    .access-row span {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(45, 36, 51, 0.52);
+      font-weight: 900;
+    }
+
+    .access-row b {
+      font-size: 26px;
+      color: var(--blue);
+      letter-spacing: -0.03em;
+    }
+
+    .screenshot-note {
+      margin-top: 10px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: rgba(45, 36, 51, 0.58);
       font-weight: 700;
+    }
+
+    .footer {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 14px;
+      z-index: 30;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .admin-btn {
+      pointer-events: auto;
+      border: 0;
+      background: transparent;
+      color: rgba(45, 36, 51, 0.36);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: lowercase;
+      cursor: pointer;
+      padding: 8px 14px;
+      border-radius: 999px;
+    }
+
+    .admin-btn:hover {
+      color: var(--blue);
+      background: rgba(255, 255, 255, 0.58);
     }
 
     .hidden {
       display: none !important;
     }
 
-    @media (max-width: 380px) {
+    @media (max-width: 420px) {
+      .page {
+        padding: 18px 13px 70px;
+      }
+
       .card {
-        padding: 30px 18px;
-        border-radius: 26px;
+        border-radius: 30px;
+        padding: 28px 16px 24px;
       }
 
       .countdown {
@@ -260,114 +484,193 @@
 
       .time-box {
         padding: 16px 10px;
+        border-radius: 21px;
+      }
+
+      .access-row b {
+        font-size: 24px;
       }
     }
   </style>
 </head>
 
 <body>
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-box">
+      <div class="loading-icon">D</div>
+      <h1>Hai Dea</h1>
+      <p>Selamat datang. Ada sesuatu yang sedang disiapkan khusus untukmu.</p>
+    </div>
+  </div>
+
   <main class="page">
-    <div class="glow one"></div>
-    <div class="glow two"></div>
+    <div class="decor one"></div>
+    <div class="decor two"></div>
 
     <section class="card">
-      <div class="badge">Private Access</div>
+      <div class="content">
+        <div class="badge">Private Access</div>
 
-      <h1 id="mainTitle">Sesuatu Sedang Menunggu</h1>
+        <h1 id="mainTitle">Sesuatu Sedang Menunggu</h1>
 
-      <p class="subtitle" id="subtitle">
-        Halaman ini belum bisa dibuka sekarang.
-        Tunggu sampai waktunya tiba.
-      </p>
+        <p class="subtitle" id="subtitle">
+          Halaman ini belum bisa dibuka sekarang.
+          Tunggu sampai waktunya tiba, lalu masukkan akses rahasianya.
+        </p>
 
-      <div class="countdown" id="countdown">
-        <div class="time-box">
-          <strong id="days">00</strong>
-          <span>Hari</span>
+        <div class="countdown" id="countdown">
+          <div class="time-box">
+            <strong id="days">00</strong>
+            <span>Hari</span>
+          </div>
+
+          <div class="time-box">
+            <strong id="hours">00</strong>
+            <span>Jam</span>
+          </div>
+
+          <div class="time-box">
+            <strong id="minutes">00</strong>
+            <span>Menit</span>
+          </div>
+
+          <div class="time-box">
+            <strong id="seconds">00</strong>
+            <span>Detik</span>
+          </div>
         </div>
 
-        <div class="time-box">
-          <strong id="hours">00</strong>
-          <span>Jam</span>
+        <p class="message" id="message">
+          Kunci akan terbuka pada 2 Juni 2026, 23:59.
+        </p>
+
+        <div class="unlock-text hidden" id="unlockText">
+          Waktunya tiba. Pintu pertama sudah terbuka.
         </div>
 
-        <div class="time-box">
-          <strong id="minutes">00</strong>
-          <span>Menit</span>
-        </div>
+        <form class="login-form" id="loginForm">
+          <div>
+            <label class="login-label" for="usernameInput">Username</label>
+            <input
+              class="login-input"
+              id="usernameInput"
+              type="text"
+              placeholder="Masukkan username"
+              autocomplete="off"
+            />
+          </div>
 
-        <div class="time-box">
-          <strong id="seconds">00</strong>
-          <span>Detik</span>
-        </div>
+          <div>
+            <label class="login-label" for="passwordInput">Password</label>
+            <input
+              class="login-input"
+              id="passwordInput"
+              type="password"
+              placeholder="Masukkan password"
+              autocomplete="off"
+            />
+          </div>
+
+          <button class="login-btn" id="loginBtn" type="submit" disabled>
+            Masuk
+          </button>
+
+          <p class="login-message" id="loginMessage"></p>
+        </form>
+
+        <button class="hint-btn" id="hintBtn" type="button">
+          Butuh Petunjuk?
+        </button>
+
+        <section class="hint-panel hidden" id="hintPanel">
+          <div class="riddle-card">
+            <strong>Petunjuk Username</strong>
+            <p>
+              Namaku punya tiga pintu kecil.
+              Ambil huruf pertama dari setiap pintu,
+              lalu satukan tanpa spasi.
+            </p>
+          </div>
+
+          <div class="riddle-card">
+            <strong>Petunjuk Password</strong>
+            <p>
+              Kunci kedua adalah namaku yang paling sederhana,
+              ditambah tahun awal ceritaku dimulai.
+              Gunakan huruf kecil dan satu spasi di tengah.
+            </p>
+          </div>
+
+          <button class="show-access-btn" id="showAccessBtn" type="button">
+            Tampilkan Kartu Akses
+          </button>
+
+          <div class="access-card hidden" id="accessCard">
+            <strong>Kartu Akses Rahasia</strong>
+            <h2>Simpan ini baik-baik</h2>
+
+            <div class="access-row">
+              <span>Username</span>
+              <b>DMP</b>
+            </div>
+
+            <div class="access-row">
+              <span>Password</span>
+              <b>dea 2005</b>
+            </div>
+
+            <p class="screenshot-note">
+              Boleh di-screenshot dulu. Tapi pintunya tetap baru bisa dibuka setelah waktunya tiba.
+            </p>
+          </div>
+        </section>
       </div>
-
-      <p class="message" id="message">
-        Kunci akan terbuka pada 20 Juni 2026.
-      </p>
-
-      <div class="unlock-text hidden" id="unlockText">
-        Waktunya tiba. Pintu pertama sudah terbuka.
-      </div>
-
-      <form class="login-form hidden" id="loginForm">
-        <div>
-          <label class="login-label" for="usernameInput">Username</label>
-          <input
-            class="login-input"
-            id="usernameInput"
-            type="text"
-            placeholder="Masukkan username"
-            autocomplete="off"
-          />
-        </div>
-
-        <div>
-          <label class="login-label" for="passwordInput">Password</label>
-          <input
-            class="login-input"
-            id="passwordInput"
-            type="password"
-            placeholder="Masukkan password"
-            autocomplete="off"
-          />
-        </div>
-
-        <button class="login-btn" type="submit">Masuk</button>
-        <p class="login-message" id="loginMessage"></p>
-      </form>
-
-      <button class="admin-test-btn" id="adminTestBtn">
-        Admin Test Login
-      </button>
     </section>
   </main>
 
-  <script>
-    const targetDate = new Date("June 20, 2026 00:00:00").getTime();
+  <footer class="footer">
+    <button class="admin-btn" id="adminBtn" type="button">admin</button>
+  </footer>
 
-    const validUsername = "admin";
-    const validPassword = "20062026";
+  <script>
+    const targetDate = new Date("June 2, 2026 23:59:00").getTime();
+
+    const validUsername = "DMP";
+    const validPassword = "dea 2005";
+
+    const loadingScreen = document.getElementById("loadingScreen");
 
     const daysEl = document.getElementById("days");
     const hoursEl = document.getElementById("hours");
     const minutesEl = document.getElementById("minutes");
     const secondsEl = document.getElementById("seconds");
 
-    const countdownEl = document.getElementById("countdown");
     const messageEl = document.getElementById("message");
     const unlockTextEl = document.getElementById("unlockText");
-    const adminTestBtn = document.getElementById("adminTestBtn");
-
     const mainTitle = document.getElementById("mainTitle");
     const subtitle = document.getElementById("subtitle");
 
     const loginForm = document.getElementById("loginForm");
+    const loginBtn = document.getElementById("loginBtn");
     const usernameInput = document.getElementById("usernameInput");
     const passwordInput = document.getElementById("passwordInput");
     const loginMessage = document.getElementById("loginMessage");
 
+    const hintBtn = document.getElementById("hintBtn");
+    const hintPanel = document.getElementById("hintPanel");
+    const showAccessBtn = document.getElementById("showAccessBtn");
+    const accessCard = document.getElementById("accessCard");
+
+    const adminBtn = document.getElementById("adminBtn");
+
     let isUnlocked = false;
+    let timer = null;
+
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        loadingScreen.classList.add("hide");
+      }, 1650);
+    });
 
     function padNumber(number) {
       return String(number).padStart(2, "0");
@@ -405,18 +708,16 @@
       secondsEl.textContent = "00";
 
       mainTitle.textContent = "Pintu Pertama Terbuka";
-      subtitle.textContent = "Masukkan akses rahasia untuk melanjutkan perjalanan kecil ini.";
+      subtitle.textContent = "Masukkan akses rahasia yang sudah kamu temukan.";
       messageEl.textContent = "Countdown selesai.";
       unlockTextEl.classList.remove("hidden");
-      loginForm.classList.remove("hidden");
 
-      adminTestBtn.textContent = "Unlocked";
-      adminTestBtn.disabled = true;
-      adminTestBtn.style.opacity = "0.45";
+      loginBtn.disabled = false;
+      loginBtn.textContent = "Masuk";
 
       setTimeout(() => {
         usernameInput.focus();
-      }, 200);
+      }, 250);
     }
 
     function handleLogin(event) {
@@ -425,28 +726,55 @@
       const username = usernameInput.value.trim();
       const password = passwordInput.value.trim();
 
+      if (!isUnlocked) {
+        loginMessage.style.color = "#C95650";
+        loginMessage.textContent = "Belum waktunya. Simpan dulu kartu akses ini.";
+        return;
+      }
+
       if (username === validUsername && password === validPassword) {
-        loginMessage.style.color = "#ffd166";
+        loginMessage.style.color = "#4E6EA2";
         loginMessage.textContent = "Akses diterima. Membuka game pertama...";
 
         setTimeout(() => {
           window.location.href = "mini-game.html";
         }, 700);
       } else {
-        loginMessage.style.color = "#ffb3c7";
-        loginMessage.textContent = "Username atau password salah.";
+        loginMessage.style.color = "#C95650";
+        loginMessage.textContent = "Username atau password belum tepat.";
       }
     }
 
-    adminTestBtn.addEventListener("click", () => {
+    hintBtn.addEventListener("click", () => {
+      hintPanel.classList.toggle("hidden");
+      hintBtn.textContent = hintPanel.classList.contains("hidden")
+        ? "Butuh Petunjuk?"
+        : "Sembunyikan Petunjuk";
+    });
+
+    showAccessBtn.addEventListener("click", () => {
+      accessCard.classList.remove("hidden");
+      showAccessBtn.classList.add("hidden");
+
+      setTimeout(() => {
+        accessCard.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+      }, 120);
+    });
+
+    adminBtn.addEventListener("click", () => {
       unlockCountdown();
       clearInterval(timer);
+      loginMessage.style.color = "#4E6EA2";
+      loginMessage.textContent = "Mode admin aktif. Login sudah bisa dicoba.";
     });
 
     loginForm.addEventListener("submit", handleLogin);
 
     updateCountdown();
-    const timer = setInterval(updateCountdown, 1000);
+    timer = setInterval(updateCountdown, 1000);
   </script>
 </body>
 </html>
