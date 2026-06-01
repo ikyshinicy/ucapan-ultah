@@ -210,6 +210,17 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
       position: relative;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .envelope:hover {
+      transform: translate(3px, 3px);
+      box-shadow: 3px 3px 0 #2d2433;
+    }
+
+    .envelope.opened {
+      background: linear-gradient(145deg, #BEE0FE 0 48%, #A2D2FF 49% 100%);
     }
 
     .envelope::before {
@@ -349,6 +360,13 @@
     .primary-btn:active {
       transform: translate(3px, 3px);
       box-shadow: 2px 2px 0 #2d2433;
+    }
+
+    .primary-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: 5px 5px 0 #2d2433;
     }
 
     .hidden {
@@ -554,9 +572,9 @@
         <section id="thinkingPanel" class="thinking hidden">
           <div class="big">🎩</div>
           <p>
-            Mirana sedang membaca pola jawabanmu<span class="dots"></span><br>
-            Mengirim energi ke amplop prediksi<span class="dots"></span><br>
-            Menyusun hasil akhir<span class="dots"></span>
+            Semua jawaban sudah terkunci<span class="dots"></span><br>
+            Sekarang klik amplop prediksi untuk membuka hasilnya<span class="dots"></span><br>
+            Jangan buka terlalu cepat ya<span class="dots"></span>
           </p>
         </section>
 
@@ -569,6 +587,7 @@
 
           <div class="action-row">
             <button class="primary-btn" id="restartBtn">Ulangi Show</button>
+            <button class="primary-btn" id="nextBtn">Lanjut</button>
           </div>
         </section>
       </div>
@@ -688,6 +707,7 @@
 
     const startBtn = document.getElementById("startBtn");
     const restartBtn = document.getElementById("restartBtn");
+    const nextBtn = document.getElementById("nextBtn");
     const introPanel = document.getElementById("introPanel");
     const questionPanel = document.getElementById("questionPanel");
     const thinkingPanel = document.getElementById("thinkingPanel");
@@ -706,14 +726,22 @@
 
     let currentIndex = 0;
     let selected = {};
+    let isEnvelopeReady = false;
+    let isResultRevealed = false;
 
     startBtn.addEventListener("click", startShow);
     restartBtn.addEventListener("click", resetShow);
     submitFreeAnswerBtn.addEventListener("click", submitFreeAnswer);
+    envelope.addEventListener("click", openPredictionEnvelope);
+    nextBtn.addEventListener("click", () => {
+      window.location.href = "polaroid.html";
+    });
 
     function startShow() {
       currentIndex = 0;
       selected = {};
+      isEnvelopeReady = false;
+      isResultRevealed = false;
 
       introPanel.classList.add("hidden");
       resultPanel.classList.add("hidden");
@@ -722,6 +750,7 @@
       errorNote.classList.remove("show");
 
       envelope.textContent = "Amplop Terkunci";
+      envelope.classList.remove("opened");
       lockText.textContent = "Jawab pelan-pelan. Prediksi Mirana masih tertutup.";
 
       speechText.textContent = "Pertanyaan pertama akan membuka pintu kecil di pikiranmu.";
@@ -789,14 +818,29 @@
     function finishQuestions() {
       questionPanel.classList.add("hidden");
       thinkingPanel.classList.remove("hidden");
+      resultPanel.classList.add("hidden");
 
-      speechText.textContent = "Diam sebentar. Mirana sedang mencocokkan semua jawabanmu dengan isi amplop.";
+      isEnvelopeReady = true;
+      isResultRevealed = false;
+
+      speechText.textContent = "Semua jawabanmu sudah terkunci. Sekarang, tolong klik amplop prediksi untuk membuka hasilnya.";
+      envelope.textContent = "Klik Amplop";
+      envelope.classList.remove("opened");
+      lockText.textContent = "Amplop sudah siap dibuka. Klik amplop prediksi di atas.";
+    }
+
+    async function openPredictionEnvelope() {
+      if (!isEnvelopeReady || isResultRevealed) return;
+
+      isResultRevealed = true;
+      envelope.classList.add("opened");
       envelope.textContent = "Membuka...";
       lockText.textContent = "Prediksi sedang dibaca ulang.";
+      speechText.textContent = "Ssst... Mirana sedang membuka amplopnya pelan-pelan.";
 
       setTimeout(async () => {
         await revealResult();
-      }, 1600);
+      }, 1100);
     }
 
     function buildPayload() {
@@ -821,6 +865,7 @@
       thinkingPanel.classList.add("hidden");
       resultPanel.classList.remove("hidden");
 
+      isEnvelopeReady = false;
       envelope.textContent = "Prediksi Terbuka!";
       lockText.textContent = "Ternyata dari awal, arahnya sudah ke sini.";
       speechText.textContent = "Mirana sudah menebaknya. Semua pilihanmu mengarah ke satu pesan.";
@@ -905,7 +950,10 @@
       resultPanel.classList.add("hidden");
       errorNote.classList.remove("show");
 
+      isEnvelopeReady = false;
+      isResultRevealed = false;
       envelope.textContent = "Amplop Prediksi";
+      envelope.classList.remove("opened");
       lockText.textContent = "Prediksi ini sudah Mirana siapkan sebelum kamu menjawab.";
 
       speechText.textContent = "Halo, aku Mirana. Malam ini aku akan jadi pesulap kecilmu dan mencoba membaca isi pikiranmu lewat beberapa pilihan rahasia.";
