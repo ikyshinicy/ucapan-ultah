@@ -595,7 +595,8 @@
   </main>
 
   <script>
-    const AI_ENDPOINT = "https://YOUR-BACKEND-ENDPOINT/generate-prediction";
+    const AI_ENDPOINT = "https://cavouyzyasnuygkuwizy.supabase.co/functions/v1/generate-prediction";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNhdm91eXp5YXNudXlna3V3aXp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NjQzMDIsImV4cCI6MjA5NDQ0MDMwMn0.P9TepO4RLhxHv03ybUlwGMefCwkdjCnDwNpfqzAS2lo";
 
     const questions = [
       {
@@ -882,14 +883,12 @@
     }
 
     async function generateAiPrediction(payload) {
-      if (AI_ENDPOINT.includes("YOUR-BACKEND-ENDPOINT")) {
-        throw new Error("AI endpoint belum diatur.");
-      }
-
       const response = await fetch(AI_ENDPOINT, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "apikey": SUPABASE_ANON_KEY,
+          "Authorization": "Bearer " + SUPABASE_ANON_KEY
         },
         body: JSON.stringify(payload)
       });
