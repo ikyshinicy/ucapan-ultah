@@ -23,11 +23,14 @@
       color: #fff;
       overflow: hidden;
       user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
     }
 
     .game-page {
       width: 100vw;
       height: 100vh;
+      height: 100dvh;
       position: relative;
       overflow: hidden;
       padding: 18px;
@@ -122,6 +125,10 @@
       font-size: 14px;
       cursor: pointer;
       box-shadow: 0 14px 34px rgba(255, 111, 174, 0.25);
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .result-actions {
@@ -134,8 +141,8 @@
     .game-item {
       position: absolute;
       z-index: 10;
-      width: 58px;
-      height: 58px;
+      width: 72px;
+      height: 72px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -145,6 +152,10 @@
       touch-action: manipulation;
       animation: fall linear forwards;
       filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.35));
+      outline: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .game-item.flower {
@@ -210,8 +221,8 @@
       }
 
       .game-item {
-        width: 54px;
-        height: 54px;
+        width: 70px;
+        height: 70px;
         font-size: 38px;
       }
 
@@ -281,7 +292,7 @@
     let spawnTimer = null;
     let speedUpTimer = null;
     let spawnDelay = 780;
-    let fallDuration = 4200;
+    let fallDuration = 5000;
 
     startBtn.addEventListener("click", startGame);
     restartBtn.addEventListener("click", startGame);
@@ -297,7 +308,7 @@
       lives = MAX_LIVES;
       isPlaying = true;
       spawnDelay = 780;
-      fallDuration = 4200;
+      fallDuration = 5000;
 
       updateStats();
 
@@ -312,7 +323,7 @@
         if (!isPlaying) return;
 
         spawnDelay = Math.max(430, spawnDelay - 55);
-        fallDuration = Math.max(2500, fallDuration - 170);
+        fallDuration = Math.max(3400, fallDuration - 120);
 
         clearInterval(spawnTimer);
         spawnTimer = setInterval(spawnItem, spawnDelay);
@@ -329,7 +340,7 @@
       item.type = "button";
       item.textContent = isBad ? "💩" : "💐";
 
-      const size = 58;
+      const size = 72;
       const safeWidth = window.innerWidth - size - 16;
       const x = Math.max(8, Math.random() * safeWidth);
 
@@ -337,8 +348,14 @@
       item.style.top = "-70px";
       item.style.animationDuration = fallDuration + "ms";
 
-      item.addEventListener("click", (event) => {
+      item.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
         event.stopPropagation();
+
+        if (!isPlaying) return;
+        if (item.dataset.clicked === "true") return;
+
+        item.dataset.clicked = "true";
 
         const rect = item.getBoundingClientRect();
 
