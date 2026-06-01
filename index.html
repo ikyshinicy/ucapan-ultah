@@ -293,6 +293,17 @@
       font-weight: 750;
     }
 
+    .mode-note {
+      margin: 0 auto 14px;
+      padding: 11px 13px;
+      border-radius: 18px;
+      background: rgba(78, 110, 162, 0.10);
+      color: var(--blue);
+      font-size: 13px;
+      line-height: 1.45;
+      font-weight: 850;
+    }
+
     .login-form {
       display: grid;
       gap: 12px;
@@ -335,7 +346,8 @@
 
     .login-btn,
     .hint-btn,
-    .show-access-btn {
+    .show-access-btn,
+    .back-dea-btn {
       width: 100%;
       border: 0;
       border-radius: 999px;
@@ -371,6 +383,13 @@
       background: #fff;
       color: var(--blue);
       border: 2px solid rgba(78, 110, 162, 0.18);
+    }
+
+    .back-dea-btn {
+      margin-top: 12px;
+      background: rgba(255, 255, 255, 0.76);
+      color: var(--red);
+      border: 2px solid rgba(201, 86, 80, 0.18);
     }
 
     .login-message {
@@ -544,7 +563,7 @@
 
     <section class="card">
       <div class="content">
-        <div class="badge">Private Access</div>
+        <div class="badge" id="modeBadge">Private Access</div>
 
         <h1 id="mainTitle">Sesuatu Sedang Menunggu</h1>
 
@@ -583,6 +602,10 @@
           Waktunya tiba. Pintu pertama sudah terbuka.
         </div>
 
+        <div class="mode-note hidden" id="modeNote">
+          Mode admin aktif. Gunakan login admin untuk testing.
+        </div>
+
         <form class="login-form" id="loginForm">
           <div>
             <label class="login-label" for="usernameInput">Username</label>
@@ -606,12 +629,16 @@
             />
           </div>
 
-          <button class="login-btn" id="loginBtn" type="submit" disabled>
+          <button class="login-btn" id="loginBtn" type="submit">
             Masuk
           </button>
 
           <p class="login-message" id="loginMessage"></p>
         </form>
+
+        <button class="back-dea-btn hidden" id="backDeaBtn" type="button">
+          Kembali ke Mode Dea
+        </button>
 
         <button class="hint-btn" id="hintBtn" type="button">
           Butuh Petunjuk?
@@ -670,8 +697,11 @@
   <script>
     const targetDate = new Date("June 2, 2026 23:59:00").getTime();
 
-    const validUsername = "DMP";
-    const validPassword = "dea 2005";
+    const deaUsername = "DMP";
+    const deaPassword = "dea 2005";
+
+    const adminUsername = "admin";
+    const adminPassword = "ikyadmin";
 
     const splashScreen = document.getElementById("splashScreen");
 
@@ -684,6 +714,8 @@
     const unlockTextEl = document.getElementById("unlockText");
     const mainTitle = document.getElementById("mainTitle");
     const subtitle = document.getElementById("subtitle");
+    const modeBadge = document.getElementById("modeBadge");
+    const modeNote = document.getElementById("modeNote");
 
     const loginForm = document.getElementById("loginForm");
     const loginBtn = document.getElementById("loginBtn");
@@ -697,8 +729,10 @@
     const accessCard = document.getElementById("accessCard");
 
     const adminBtn = document.getElementById("adminBtn");
+    const backDeaBtn = document.getElementById("backDeaBtn");
 
     let isUnlocked = false;
+    let isAdminMode = false;
     let timer = null;
 
     window.addEventListener("load", () => {
@@ -747,7 +781,6 @@
       messageEl.textContent = "Countdown selesai.";
       unlockTextEl.classList.remove("hidden");
 
-      loginBtn.disabled = false;
       loginBtn.textContent = "Masuk";
 
       setTimeout(() => {
@@ -761,13 +794,24 @@
       const username = usernameInput.value.trim();
       const password = passwordInput.value.trim();
 
+      if (username === adminUsername && password === adminPassword) {
+        loginMessage.style.color = "#4E6EA2";
+        loginMessage.textContent = "Admin diterima. Membuka game pertama...";
+
+        setTimeout(() => {
+          window.location.href = "mini-game.html";
+        }, 700);
+
+        return;
+      }
+
       if (!isUnlocked) {
         loginMessage.style.color = "#C95650";
         loginMessage.textContent = "Belum waktunya. Simpan dulu kartu akses ini.";
         return;
       }
 
-      if (username === validUsername && password === validPassword) {
+      if (username === deaUsername && password === deaPassword) {
         loginMessage.style.color = "#4E6EA2";
         loginMessage.textContent = "Akses diterima. Membuka game pertama...";
 
@@ -778,6 +822,51 @@
         loginMessage.style.color = "#C95650";
         loginMessage.textContent = "Username atau password belum tepat.";
       }
+    }
+
+    function activateAdminMode() {
+      isAdminMode = true;
+
+      modeBadge.textContent = "Admin Access";
+      mainTitle.textContent = "Mode Admin";
+      subtitle.textContent = "Masukkan login admin untuk testing. Mode ini tidak memakai timer.";
+      modeNote.classList.remove("hidden");
+
+      usernameInput.value = "";
+      passwordInput.value = "";
+      usernameInput.placeholder = "admin";
+      passwordInput.placeholder = "password admin";
+      loginMessage.textContent = "";
+
+      hintBtn.classList.add("hidden");
+      hintPanel.classList.add("hidden");
+      backDeaBtn.classList.remove("hidden");
+
+      usernameInput.focus();
+    }
+
+    function deactivateAdminMode() {
+      isAdminMode = false;
+
+      modeBadge.textContent = "Private Access";
+
+      if (isUnlocked) {
+        mainTitle.textContent = "Pintu Pertama Terbuka";
+        subtitle.textContent = "Masukkan akses rahasia yang sudah kamu temukan.";
+      } else {
+        mainTitle.textContent = "Sesuatu Sedang Menunggu";
+        subtitle.textContent = "Halaman ini belum bisa dibuka sekarang. Tunggu sampai waktunya tiba, lalu masukkan akses rahasianya.";
+      }
+
+      modeNote.classList.add("hidden");
+      backDeaBtn.classList.add("hidden");
+      hintBtn.classList.remove("hidden");
+
+      usernameInput.value = "";
+      passwordInput.value = "";
+      usernameInput.placeholder = "Masukkan username";
+      passwordInput.placeholder = "Masukkan password";
+      loginMessage.textContent = "";
     }
 
     hintBtn.addEventListener("click", () => {
@@ -799,13 +888,8 @@
       }, 120);
     });
 
-    adminBtn.addEventListener("click", () => {
-      unlockCountdown();
-      clearInterval(timer);
-      loginMessage.style.color = "#4E6EA2";
-      loginMessage.textContent = "Mode admin aktif. Login sudah bisa dicoba.";
-    });
-
+    adminBtn.addEventListener("click", activateAdminMode);
+    backDeaBtn.addEventListener("click", deactivateAdminMode);
     loginForm.addEventListener("submit", handleLogin);
 
     updateCountdown();
