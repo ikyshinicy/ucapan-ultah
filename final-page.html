@@ -729,6 +729,57 @@
       margin-bottom: 10px;
     }
 
+
+    .letter-cover,
+    .letter-content {
+      position: relative;
+      z-index: 2;
+      transition: 0.45s ease;
+    }
+
+    .letter-cover {
+      min-height: 190px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .letter-cover::after {
+      content: "Klik surat untuk membaca";
+      display: inline-block;
+      margin-top: 12px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 900;
+      box-shadow: 0 10px 20px rgba(78, 110, 162, 0.18);
+    }
+
+    .letter-content {
+      display: none;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .letter-paper.read .letter-cover {
+      display: none;
+    }
+
+    .letter-paper.read .letter-content {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .envelope-wrap:not(.open) .letter-paper {
+      pointer-events: none;
+    }
+
     .envelope {
       position: absolute;
       left: 50%;
@@ -1211,26 +1262,33 @@
         <div class="badge">Last Letter</div>
         <h2>Satu Surat Terakhir</h2>
         <p>
-          Klik amplopnya pelan-pelan. Ada sesuatu yang disimpan di dalamnya.
+          Klik amplop untuk membukanya, lalu klik surat yang keluar untuk membaca isinya.
         </p>
       </div>
 
       <div class="envelope-stage">
         <div class="envelope-wrap" id="envelopeWrap" title="Klik untuk membuka surat">
-          <div class="letter-paper">
-            <h3>Untuk Dea</h3>
-            <p>
-              Selamat ulang tahun, Dea Mulia Putri.
-              3 Juni bukan sekadar tanggal, tapi hari kecil yang pantas dirayakan dengan cara yang manis.
-            </p>
-            <p>
-              Dan untuk Cagya, dari seseorang yang mungkin tidak selalu pandai mengatakan semuanya secara langsung:
-              semoga hari ini terasa hangat, lucu, dan sedikit ajaib.
-            </p>
-            <p>
-              Kamu layak dirayakan. Kamu layak bahagia.
-              Dan kamu layak menerima sesuatu yang tulus.
-            </p>
+          <div class="letter-paper" id="letterPaper">
+            <div class="letter-cover" id="letterCover">
+              <h3>Surat Sudah Keluar</h3>
+              <p>Klik surat ini pelan-pelan untuk membaca isinya.</p>
+            </div>
+
+            <div class="letter-content" id="letterContent">
+              <h3>Untuk Dea</h3>
+              <p>
+                Selamat ulang tahun, Dea Mulia Putri.
+                3 Juni bukan sekadar tanggal, tapi hari kecil yang pantas dirayakan dengan cara yang manis.
+              </p>
+              <p>
+                Dan untuk Cagya, dari seseorang yang mungkin tidak selalu pandai mengatakan semuanya secara langsung:
+                semoga hari ini terasa hangat, lucu, dan sedikit ajaib.
+              </p>
+              <p>
+                Kamu layak dirayakan. Kamu layak bahagia.
+                Dan kamu layak menerima sesuatu yang tulus.
+              </p>
+            </div>
           </div>
 
           <div class="envelope">
@@ -1300,6 +1358,8 @@
     const musicToggleBtn = document.getElementById("musicToggleBtn");
 
     const envelopeWrap = document.getElementById("envelopeWrap");
+    const letterPaper = document.getElementById("letterPaper");
+    const letterCover = document.getElementById("letterCover");
 
     const chatForm = document.getElementById("chatForm");
     const chatInput = document.getElementById("chatInput");
@@ -1364,7 +1424,15 @@
     });
 
     envelopeWrap.addEventListener("click", () => {
-      envelopeWrap.classList.toggle("open");
+      if (!envelopeWrap.classList.contains("open")) {
+        envelopeWrap.classList.add("open");
+      }
+    });
+
+    letterPaper.addEventListener("click", (event) => {
+      event.stopPropagation();
+      if (!envelopeWrap.classList.contains("open")) return;
+      letterPaper.classList.add("read");
     });
 
     chatForm.addEventListener("submit", async (event) => {
