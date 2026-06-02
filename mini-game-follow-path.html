@@ -29,6 +29,7 @@
     .page {
       width: 100vw;
       height: 100vh;
+      height: 100dvh;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -230,6 +231,7 @@
       transform: translate(-50%, -50%);
       touch-action: none;
       overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .player img {
@@ -238,6 +240,7 @@
       object-fit: cover;
       border-radius: 999px;
       display: block;
+      pointer-events: none;
     }
 
     .player .fallback-star {
@@ -301,9 +304,10 @@
     }
 
     .jumpscare-box {
-      width: 240px;
-      height: 240px;
-      border-radius: 999px;
+      width: 250px;
+      min-height: 275px;
+      border-radius: 36px;
+      padding: 18px 14px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -325,12 +329,34 @@
       animation: jumpscareShake 0.22s linear infinite;
     }
 
+    .jumpscare-face.hidden {
+      display: none;
+    }
+
+    .jumpscare-photo {
+      width: 168px;
+      height: 168px;
+      border-radius: 999px;
+      object-fit: cover;
+      border: 6px solid #ffffff;
+      box-shadow:
+        0 0 0 8px rgba(255, 175, 204, 0.35),
+        0 16px 38px rgba(142, 111, 156, 0.38);
+      animation: jumpscareShake 0.22s linear infinite;
+      background: #fff;
+    }
+
+    .jumpscare-photo.hidden {
+      display: none;
+    }
+
     .jumpscare-text {
-      margin-top: 10px;
+      margin-top: 14px;
       font-size: 25px;
       font-weight: 1000;
       letter-spacing: 0.08em;
       color: #7a5d8b;
+      text-align: center;
     }
 
     @keyframes jumpscareFlash {
@@ -456,8 +482,13 @@
       }
 
       .jumpscare-box {
-        width: 210px;
-        height: 210px;
+        width: 220px;
+        min-height: 245px;
+      }
+
+      .jumpscare-photo {
+        width: 145px;
+        height: 145px;
       }
 
       .jumpscare-face {
@@ -525,7 +556,7 @@
         <div class="danger three">💩</div>
 
         <div class="player" id="player">
-          <img id="playerImg" src="assets/player.png" alt="">
+          <img id="playerImg" src="assets/drag-player.png" alt="">
           <span class="fallback-star">⭐</span>
         </div>
       </div>
@@ -536,10 +567,18 @@
 
   <section class="jumpscare" id="jumpscare">
     <div class="jumpscare-box">
-      <div class="jumpscare-face">💩</div>
+      <img
+        class="jumpscare-photo"
+        id="jumpscarePhoto"
+        src="assets/jumpscare-photo.jpg"
+        alt=""
+      >
+      <div class="jumpscare-face hidden" id="jumpscareFallback">💩</div>
       <div class="jumpscare-text">KAGET KAN?</div>
     </div>
   </section>
+
+  <audio id="jumpscareAudio" src="assets/jumpscare-sound.mp3" preload="auto"></audio>
 
   <section class="win-panel" id="winPanel">
     <div class="win-box">
@@ -566,6 +605,9 @@
     const resetBtn = document.getElementById("resetBtn");
     const winPanel = document.getElementById("winPanel");
     const jumpscare = document.getElementById("jumpscare");
+    const jumpscarePhoto = document.getElementById("jumpscarePhoto");
+    const jumpscareFallback = document.getElementById("jumpscareFallback");
+    const jumpscareAudio = document.getElementById("jumpscareAudio");
     const playAgainBtn = document.getElementById("playAgainBtn");
     const nextPageBtn = document.getElementById("nextPageBtn");
     const dangerEls = document.querySelectorAll(".danger");
@@ -591,6 +633,11 @@
     playerImg.addEventListener("load", () => {
       player.classList.remove("no-image");
       playerImg.style.display = "block";
+    });
+
+    jumpscarePhoto.addEventListener("error", () => {
+      jumpscarePhoto.classList.add("hidden");
+      jumpscareFallback.classList.remove("hidden");
     });
 
     function buildPathPoints() {
@@ -697,6 +744,26 @@
       }, 420);
     }
 
+    function playJumpscareSound() {
+      if (!jumpscareAudio) return;
+
+      try {
+        jumpscareAudio.pause();
+        jumpscareAudio.currentTime = 0;
+        jumpscareAudio.volume = 0.95;
+
+        const playPromise = jumpscareAudio.play();
+
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(() => {
+            console.log("Jumpscare sound blocked.");
+          });
+        }
+      } catch (error) {
+        console.log("Jumpscare sound error:", error);
+      }
+    }
+
     function winGame() {
       if (hasWon) return;
 
@@ -708,6 +775,8 @@
       jumpscare.classList.remove("show");
       void jumpscare.offsetWidth;
       jumpscare.classList.add("show");
+
+      playJumpscareSound();
 
       setTimeout(() => {
         jumpscare.classList.remove("show");
