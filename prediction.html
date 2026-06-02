@@ -183,6 +183,19 @@
       overflow: hidden;
     }
 
+    .envelope-panel.ready .envelope {
+      animation: envelopePulse 1s ease-in-out infinite;
+    }
+
+    .envelope-panel.open .envelope {
+      background: linear-gradient(145deg, #BEE0FE 0 48%, #A2D2FF 49% 100%);
+    }
+
+    @keyframes envelopePulse {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-4px) scale(1.02); }
+    }
+
     .envelope-panel::after {
       content: "PREDICTION";
       position: absolute;
@@ -438,6 +451,43 @@
       font-weight: 1000;
     }
 
+
+    .prediction-letter {
+      margin-top: 14px;
+      padding: 18px 16px;
+      border: 4px solid #2d2433;
+      border-radius: 22px;
+      background: #fffdf8;
+      box-shadow: 6px 6px 0 #2d2433;
+      transform: translateY(34px) scale(0.92);
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: 0.55s cubic-bezier(.2, 1.15, .35, 1);
+    }
+
+    .prediction-letter.show {
+      opacity: 1;
+      max-height: 1800px;
+      transform: translateY(0) scale(1);
+    }
+
+    .prediction-letter h2 {
+      font-size: 25px;
+      line-height: 1;
+      font-weight: 1000;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      color: #2d2433;
+    }
+
+    .letter-loading {
+      font-size: 15px;
+      line-height: 1.7;
+      font-weight: 900;
+      color: #6d5578;
+    }
+
     .error-note {
       margin-top: 12px;
       padding: 10px;
@@ -527,6 +577,21 @@
           <p class="lock-text" id="lockText">
             Prediksi ini sudah Mirana siapkan sebelum kamu menjawab.
           </p>
+
+          <div class="prediction-letter hidden" id="predictionLetter">
+            <h2>Prediksi Terbuka!</h2>
+            <div class="letter-loading" id="letterLoading">
+              Mirana sedang membaca isi surat<span class="dots"></span>
+            </div>
+            <div class="result-text hidden" id="letterResultText"></div>
+            <div class="error-note" id="letterErrorNote">
+              Endpoint AI belum aktif, jadi hasil ini memakai fallback lokal.
+            </div>
+            <div class="action-row hidden" id="letterActions">
+              <button class="primary-btn" id="letterRestartBtn" type="button">Ulangi Show</button>
+              <button class="primary-btn" id="letterNextBtn" type="button">Lanjut</button>
+            </div>
+          </div>
         </section>
 
         <div class="privacy-note">
@@ -719,7 +784,15 @@
     const speechText = document.getElementById("speechText");
     const resultText = document.getElementById("resultText");
     const envelope = document.getElementById("envelope");
+    const envelopePanel = document.getElementById("envelopePanel");
     const lockText = document.getElementById("lockText");
+    const predictionLetter = document.getElementById("predictionLetter");
+    const letterLoading = document.getElementById("letterLoading");
+    const letterResultText = document.getElementById("letterResultText");
+    const letterErrorNote = document.getElementById("letterErrorNote");
+    const letterActions = document.getElementById("letterActions");
+    const letterRestartBtn = document.getElementById("letterRestartBtn");
+    const letterNextBtn = document.getElementById("letterNextBtn");
     const freeAnswerBox = document.getElementById("freeAnswerBox");
     const freeAnswerInput = document.getElementById("freeAnswerInput");
     const submitFreeAnswerBtn = document.getElementById("submitFreeAnswerBtn");
@@ -732,6 +805,10 @@
 
     startBtn.addEventListener("click", startShow);
     restartBtn.addEventListener("click", resetShow);
+    letterRestartBtn.addEventListener("click", resetShow);
+    letterNextBtn.addEventListener("click", () => {
+      window.location.href = "polaroid.html";
+    });
     submitFreeAnswerBtn.addEventListener("click", submitFreeAnswer);
     envelope.addEventListener("click", openPredictionEnvelope);
     nextBtn.addEventListener("click", () => {
@@ -749,6 +826,15 @@
       thinkingPanel.classList.add("hidden");
       questionPanel.classList.remove("hidden");
       errorNote.classList.remove("show");
+      letterErrorNote.classList.remove("show");
+      predictionLetter.classList.add("hidden");
+      predictionLetter.classList.remove("show");
+      letterLoading.classList.remove("hidden");
+      letterResultText.classList.add("hidden");
+      letterResultText.innerHTML = "";
+      letterResultText.textContent = "";
+      letterActions.classList.add("hidden");
+      envelopePanel.classList.remove("ready", "open");
 
       envelope.textContent = "Amplop Terkunci";
       envelope.classList.remove("opened");
@@ -820,6 +906,16 @@
       questionPanel.classList.add("hidden");
       thinkingPanel.classList.remove("hidden");
       resultPanel.classList.add("hidden");
+      predictionLetter.classList.add("hidden");
+      predictionLetter.classList.remove("show");
+      letterLoading.classList.remove("hidden");
+      letterResultText.classList.add("hidden");
+      letterResultText.innerHTML = "";
+      letterResultText.textContent = "";
+      letterActions.classList.add("hidden");
+      letterErrorNote.classList.remove("show");
+      envelopePanel.classList.add("ready");
+      envelopePanel.classList.remove("open");
 
       isEnvelopeReady = true;
       isResultRevealed = false;
@@ -835,13 +931,25 @@
 
       isResultRevealed = true;
       envelope.classList.add("opened");
+      envelopePanel.classList.remove("ready");
+      envelopePanel.classList.add("open");
       envelope.textContent = "Membuka...";
-      lockText.textContent = "Prediksi sedang dibaca ulang.";
+      lockText.textContent = "Surat prediksi sedang keluar dari amplop.";
       speechText.textContent = "Ssst... Mirana sedang membuka amplopnya pelan-pelan.";
+
+      predictionLetter.classList.remove("hidden");
+      letterLoading.classList.remove("hidden");
+      letterResultText.classList.add("hidden");
+      letterActions.classList.add("hidden");
+      letterErrorNote.classList.remove("show");
+
+      setTimeout(() => {
+        predictionLetter.classList.add("show");
+      }, 60);
 
       setTimeout(async () => {
         await revealResult();
-      }, 1100);
+      }, 900);
     }
 
     function buildPayload() {
@@ -864,7 +972,7 @@
 
     async function revealResult() {
       thinkingPanel.classList.add("hidden");
-      resultPanel.classList.remove("hidden");
+      resultPanel.classList.add("hidden");
 
       isEnvelopeReady = false;
       envelope.textContent = "Prediksi Terbuka!";
@@ -875,10 +983,16 @@
 
       try {
         const aiText = await generateAiPrediction(payload);
-        resultText.textContent = aiText;
+        letterLoading.classList.add("hidden");
+        letterResultText.classList.remove("hidden");
+        letterResultText.textContent = aiText;
+        letterActions.classList.remove("hidden");
       } catch (error) {
-        errorNote.classList.add("show");
-        resultText.innerHTML = buildFallbackPrediction(payload);
+        letterLoading.classList.add("hidden");
+        letterResultText.classList.remove("hidden");
+        letterErrorNote.classList.add("show");
+        letterResultText.innerHTML = buildFallbackPrediction(payload);
+        letterActions.classList.remove("hidden");
       }
     }
 
@@ -948,6 +1062,15 @@
       thinkingPanel.classList.add("hidden");
       resultPanel.classList.add("hidden");
       errorNote.classList.remove("show");
+      letterErrorNote.classList.remove("show");
+      predictionLetter.classList.add("hidden");
+      predictionLetter.classList.remove("show");
+      letterLoading.classList.remove("hidden");
+      letterResultText.classList.add("hidden");
+      letterResultText.innerHTML = "";
+      letterResultText.textContent = "";
+      letterActions.classList.add("hidden");
+      envelopePanel.classList.remove("ready", "open");
 
       isEnvelopeReady = false;
       isResultRevealed = false;
